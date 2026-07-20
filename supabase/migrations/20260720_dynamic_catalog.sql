@@ -122,6 +122,7 @@ revoke all on table public.catalog_products from anon, authenticated;
 grant select on table public.catalog_products to anon, authenticated;
 grant insert on table public.catalog_products to authenticated;
 grant update (
+  category,
   name,
   description,
   detail,

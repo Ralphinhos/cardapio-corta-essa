@@ -206,7 +206,14 @@ export function AdminProductForm({
       const query = product
         ? supabase
             .from("catalog_products")
-            .update(values)
+            .update({
+              ...values,
+              category: draft.category,
+              display_order:
+                product.category === draft.category
+                  ? product.display_order
+                  : nextOrders[draft.category],
+            })
             .eq("key", product.key)
         : supabase.from("catalog_products").insert({
             ...values,
@@ -263,7 +270,7 @@ export function AdminProductForm({
           </h2>
           <p>
             {editing
-              ? "Categoria e identificador ficam fixos para preservar pedidos antigos."
+              ? "A categoria pode ser alterada; o identificador interno é preservado para manter pedidos antigos."
               : "Após salvar, o produto entra no fim da categoria selecionada."}
           </p>
         </div>
@@ -307,7 +314,7 @@ export function AdminProductForm({
               <select
                 value={draft.category}
                 onChange={(event) => updateDraft({ category: event.target.value as Category })}
-                disabled={editing || submitting}
+                disabled={submitting}
               >
                 {catalogCategories.map((category) => (
                   <option key={category} value={category}>

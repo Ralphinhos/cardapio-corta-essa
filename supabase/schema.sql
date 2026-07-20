@@ -173,6 +173,7 @@ revoke all on table public.admin_users from anon, authenticated;
 grant select on table public.catalog_products to anon, authenticated;
 grant insert on table public.catalog_products to authenticated;
 grant update (
+  category,
   name,
   description,
   detail,
