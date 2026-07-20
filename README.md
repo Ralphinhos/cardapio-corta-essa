@@ -13,6 +13,10 @@ O projeto apresenta produtos nas categorias **Kit** e **Unidade**, permite monta
 - formulário exclusivo para entrega;
 - registro seguro de pedidos no Supabase;
 - confirmação final pelo WhatsApp;
+- painel administrativo protegido em `/admin`;
+- autenticação por e-mail e senha com Supabase Auth;
+- gestão de estoque e destaques com RLS e allowlist de administrador;
+- reserva automática de estoque ao registrar o pedido;
 - fallback para pedido direto pelo WhatsApp quando o Supabase não está ativado;
 - suporte a `prefers-reduced-motion`.
 
@@ -40,6 +44,8 @@ Copie `.env.example` para `.env.local` e configure:
 NEXT_PUBLIC_ORDERING_ENABLED=true
 SUPABASE_URL=https://SEU-PROJETO.supabase.co
 SUPABASE_SECRET_KEY=sb_secret_SUA_CHAVE
+NEXT_PUBLIC_SUPABASE_URL=https://SEU-PROJETO.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_SUA_CHAVE
 NEXT_PUBLIC_WHATSAPP_NUMBER=5535910222015
 ```
 
@@ -59,6 +65,12 @@ Acesse `http://localhost:3000`.
 4. Confirme a criação de `catalog_products`, `orders` e `order_items`.
 5. Configure as variáveis de ambiente no servidor.
 
+Para um banco já existente, execute também
+[`supabase/migrations/20260720_admin_inventory.sql`](supabase/migrations/20260720_admin_inventory.sql).
+Depois crie o usuário administrador no Supabase Auth e adicione o UUID dele à
+tabela protegida `admin_users`. O guia completo está em
+[`ADMIN_SUPABASE.md`](ADMIN_SUPABASE.md).
+
 O banco utiliza RLS e a função protegida `create_server_order`. O preço final é recalculado com os valores oficiais do banco, sem confiar nos valores enviados pelo navegador.
 
 ## Publicando na Vercel
@@ -70,6 +82,7 @@ O projeto já contém `vercel.json` e o script `build:vercel`.
 3. Cadastre as variáveis do `.env.example`.
 4. Execute o deploy.
 5. Faça um pedido de teste e confira o registro no Supabase.
+6. Acesse `/admin/login` e valide o gerenciamento de estoque.
 
 O passo a passo completo está em [`DEPLOY_VERCEL_SUPABASE.md`](DEPLOY_VERCEL_SUPABASE.md).
 
@@ -91,6 +104,10 @@ npm test                # build e testes do ambiente Sites
 4. A aplicação registra o pedido no Supabase.
 5. O cliente recebe um código como `CE-000001`.
 6. O WhatsApp abre com o resumo para confirmação.
+
+O estoque é verificado e decrementado na mesma transação que cria o pedido. Um
+produto com estoque zero continua visível, mas aparece como indisponível e não
+pode ser adicionado ao carrinho.
 
 O envio da mensagem não é automático: o cliente revisa e toca em **Enviar** no WhatsApp.
 

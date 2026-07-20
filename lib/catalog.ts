@@ -8,6 +8,8 @@ export type Product = {
   weight: string;
   price: number;
   tone: "green" | "orange";
+  stockQuantity?: number | null;
+  isTopSeller?: boolean;
 };
 
 export type CartItem = {
@@ -199,4 +201,3 @@ export const whatsappUrl = (product?: Product) => {
     : "Olá! Gostaria de fazer uma encomenda do cardápio Corta Essa.";
   return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 };
-

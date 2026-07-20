@@ -260,7 +260,15 @@ export function OrderCart({
                           <Minus aria-hidden="true" />
                         </button>
                         <span>{item.quantity}</span>
-                        <button type="button" onClick={() => onIncrease(item)} aria-label={`Aumentar ${item.product.name}`}>
+                        <button
+                          type="button"
+                          onClick={() => onIncrease(item)}
+                          aria-label={`Aumentar ${item.product.name}`}
+                          disabled={
+                            item.product.stockQuantity != null &&
+                            item.quantity >= item.product.stockQuantity
+                          }
+                        >
                           <Plus aria-hidden="true" />
                         </button>
                         <button className="checkout-line__remove" type="button" onClick={() => onRemove(item)} aria-label={`Remover ${item.product.name}`}>
