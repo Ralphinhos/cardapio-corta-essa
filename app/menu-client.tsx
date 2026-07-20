@@ -11,8 +11,8 @@ import {
   ShoppingBag,
   Sparkles,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
-import { OrderCart } from "@/app/order-cart";
 import {
   type CatalogProduct,
   type CartItem,
@@ -27,6 +27,10 @@ import {
 
 const orderingEnabled = process.env.NEXT_PUBLIC_ORDERING_ENABLED === "true";
 const PAGE_SIZE = 6;
+const OrderCart = dynamic(
+  () => import("@/app/order-cart").then((module) => module.OrderCart),
+  { ssr: false },
+);
 
 function ProductCard({
   product,
@@ -72,6 +76,7 @@ function ProductCard({
             alt={`${product.name}: ${product.description}`}
             className="product-card__image"
             loading="lazy"
+            decoding="async"
           />
         </div>
 
@@ -240,7 +245,12 @@ export function MenuClient({
       <section className="hero" id="inicio">
         <header className="topbar">
           <a className="topbar__logo" href="#inicio" aria-label="Corta Essa! — início">
-            <img src="/images/logo-transparent.png" alt="Corta Essa! Churrasco Vegetariano" />
+            <img
+              src="/images/logo-transparent.webp"
+              width="360"
+              height="219"
+              alt="Corta Essa! Churrasco Vegetariano"
+            />
           </a>
           <nav aria-label="Navegação principal">
             <a href="#cardapio">Cardápio</a>
@@ -286,16 +296,44 @@ export function MenuClient({
           </div>
 
           <div className="hero-collage" aria-hidden="true">
-            <img className="hero__ghost" src="/images/gourmet-type.png" alt="" />
+            <img
+              className="hero__ghost"
+              src="/images/gourmet-type.webp"
+              width="960"
+              height="480"
+              fetchPriority="high"
+              alt=""
+            />
             <div className="hero-collage__halo" />
             <div className="hero-secondary hero-secondary--farofa">
-              <img src="/images/divine-unit.webp" alt="" />
+              <img
+                src="/images/divine-unit.webp"
+                width="660"
+                height="660"
+                fetchPriority="low"
+                decoding="async"
+                alt=""
+              />
             </div>
             <div className="hero-secondary hero-secondary--persian">
-              <img src="/images/persian-kit.webp" alt="" />
+              <img
+                src="/images/persian-kit.webp"
+                width="535"
+                height="660"
+                fetchPriority="low"
+                decoding="async"
+                alt=""
+              />
             </div>
             <div className="hero-product-wrap hero-product-wrap--gold">
-              <img className="hero-product" src="/images/gold-unit.webp" alt="" />
+              <img
+                className="hero-product"
+                src="/images/gold-unit.webp"
+                width="130"
+                height="660"
+                decoding="async"
+                alt=""
+              />
             </div>
             <span className="hero-collage__note">100% vegetal</span>
           </div>
@@ -346,7 +384,8 @@ export function MenuClient({
                   <img
                     src={productImageUrl(productImagePath(category, product))}
                     alt={`${product.name}: ${product.description}`}
-                    loading="eager"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div className="featured-card__content">
@@ -525,7 +564,14 @@ export function MenuClient({
         <div className="order__visual" aria-hidden="true">
           <div className="order__grill" />
           <div className="order__product-backdrop" />
-          <img src="/images/red-kit.webp" alt="" />
+          <img
+            src="/images/red-kit.webp"
+            width="567"
+            height="660"
+            loading="lazy"
+            decoding="async"
+            alt=""
+          />
           <span>Feito para compartilhar</span>
         </div>
       </section>
@@ -533,7 +579,14 @@ export function MenuClient({
       <footer>
         <div className="footer__grid">
           <div className="footer__brand">
-            <img src="/images/logo-transparent.png" alt="Corta Essa!" />
+            <img
+              src="/images/logo-transparent.webp"
+              width="360"
+              height="219"
+              loading="lazy"
+              decoding="async"
+              alt="Corta Essa!"
+            />
             <div className="footer__statement">Churrasco vegetariano de verdade.</div>
           </div>
           <nav className="footer__nav" aria-label="Navegação do rodapé">
@@ -559,7 +612,7 @@ export function MenuClient({
         </div>
       </footer>
 
-      {orderingEnabled && (
+      {orderingEnabled && (cartOpen || cartItems.length > 0) && (
         <OrderCart
           items={cartItems}
           open={cartOpen}
