@@ -8,6 +8,7 @@ import {
   MapPin,
   MessageCircle,
   Minus,
+  PackageCheck,
   Plus,
   ShoppingBag,
   Trash2,
@@ -247,41 +248,57 @@ export function OrderCart({
                 </div>
 
                 <div className="checkout-lines">
-                  {items.map((item) => (
-                    <article className="checkout-line" key={productKey(item.category, item.product)}>
-                      <img
-                        src={productImageUrl(
-                          productImagePath(item.category, item.product),
-                        )}
-                        alt=""
-                      />
-                      <div className="checkout-line__copy">
-                        <h4>{item.product.name}</h4>
-                        <p>{categoryLabel(item.category)} · {item.product.weight}</p>
-                        <strong>{formatPrice(item.product.price * item.quantity)}</strong>
-                      </div>
-                      <div className="checkout-line__actions" aria-label={`Quantidade de ${item.product.name}`}>
-                        <button type="button" onClick={() => onDecrease(item)} aria-label={`Diminuir ${item.product.name}`}>
-                          <Minus aria-hidden="true" />
-                        </button>
-                        <span>{item.quantity}</span>
-                        <button
-                          type="button"
-                          onClick={() => onIncrease(item)}
-                          aria-label={`Aumentar ${item.product.name}`}
-                          disabled={
-                            item.product.stockQuantity != null &&
-                            item.quantity >= item.product.stockQuantity
-                          }
-                        >
-                          <Plus aria-hidden="true" />
-                        </button>
-                        <button className="checkout-line__remove" type="button" onClick={() => onRemove(item)} aria-label={`Remover ${item.product.name}`}>
-                          <Trash2 aria-hidden="true" />
-                        </button>
-                      </div>
-                    </article>
-                  ))}
+                  {items.map((item) => {
+                    const itemKey = productKey(item.category, item.product);
+                    const stockQuantity = item.product.stockQuantity;
+                    const stockId = `stock-limit-${itemKey}`;
+                    const atStockLimit =
+                      stockQuantity != null && item.quantity >= stockQuantity;
+
+                    return (
+                      <article className="checkout-line" key={itemKey}>
+                        <img
+                          src={productImageUrl(
+                            productImagePath(item.category, item.product),
+                          )}
+                          alt=""
+                        />
+                        <div className="checkout-line__copy">
+                          <h4>{item.product.name}</h4>
+                          <p>{categoryLabel(item.category)} · {item.product.weight}</p>
+                          {stockQuantity != null && (
+                            <span className="checkout-line__stock" id={stockId}>
+                              <PackageCheck aria-hidden="true" />
+                              Máximo disponível: {stockQuantity}
+                            </span>
+                          )}
+                          <strong>{formatPrice(item.product.price * item.quantity)}</strong>
+                        </div>
+                        <div className="checkout-line__actions" aria-label={`Quantidade de ${item.product.name}`}>
+                          <button type="button" onClick={() => onDecrease(item)} aria-label={`Diminuir ${item.product.name}`}>
+                            <Minus aria-hidden="true" />
+                          </button>
+                          <span>{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => onIncrease(item)}
+                            aria-label={
+                              atStockLimit
+                                ? `Estoque máximo atingido para ${item.product.name}`
+                                : `Aumentar ${item.product.name}`
+                            }
+                            aria-describedby={stockQuantity != null ? stockId : undefined}
+                            disabled={atStockLimit}
+                          >
+                            <Plus aria-hidden="true" />
+                          </button>
+                          <button className="checkout-line__remove" type="button" onClick={() => onRemove(item)} aria-label={`Remover ${item.product.name}`}>
+                            <Trash2 aria-hidden="true" />
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
                 </div>
 
                 <div className="checkout-total">

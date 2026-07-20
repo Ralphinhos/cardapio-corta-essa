@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Flame,
+  PackageCheck,
   PackageOpen,
   PackageX,
   ShoppingBag,
@@ -26,6 +27,7 @@ import {
   productImagePath,
   productImageUrl,
   productKey,
+  stockAvailabilityLabel,
   whatsappUrl,
 } from "@/lib/catalog";
 
@@ -93,6 +95,12 @@ function ProductCard({
           <h3>{product.name}</h3>
           <p className="product-card__description">{product.description}</p>
           {product.detail && <p className="product-card__detail">{product.detail}</p>}
+          {product.stockQuantity != null && product.stockQuantity > 0 && (
+            <p className="stock-availability product-card__availability">
+              <PackageCheck aria-hidden="true" />
+              {stockAvailabilityLabel(product.stockQuantity)}
+            </p>
+          )}
           <div className="product-card__footer">
             <div>
               <strong>{formatPrice(product.price)}</strong>
@@ -397,6 +405,12 @@ export function MenuClient({
                 <div className="featured-card__content">
                   <h3>{product.name}</h3>
                   <p>{product.description}</p>
+                  {product.stockQuantity != null && product.stockQuantity > 0 && (
+                    <p className="stock-availability featured-card__availability">
+                      <PackageCheck aria-hidden="true" />
+                      {stockAvailabilityLabel(product.stockQuantity)}
+                    </p>
+                  )}
                   <div className="featured-card__footer">
                     <div>
                       <span>{product.weight}</span>

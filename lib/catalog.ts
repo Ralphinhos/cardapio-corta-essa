@@ -24,6 +24,9 @@ export const categoryPriceSuffix = (category: Category) =>
 export const categoryPageLabel = (category: Category) =>
   categoryMetadata[category].pageLabel;
 
+export const stockAvailabilityLabel = (quantity: number) =>
+  quantity === 1 ? "Resta 1 em estoque" : `Restam ${quantity} em estoque`;
+
 export type Product = {
   key?: string;
   slug: string;
