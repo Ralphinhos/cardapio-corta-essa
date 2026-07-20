@@ -16,6 +16,9 @@ O projeto apresenta produtos nas categorias **Kit** e **Unidade**, permite monta
 - painel administrativo protegido em `/admin`;
 - autenticação por e-mail e senha com Supabase Auth;
 - gestão de estoque e destaques com RLS e allowlist de administrador;
+- cadastro e edição de produtos com upload para Supabase Storage;
+- desativação segura de produtos sem apagar o histórico de pedidos;
+- catálogo dinâmico com seis produtos por página em cada categoria;
 - reserva automática de estoque ao registrar o pedido;
 - fallback para pedido direto pelo WhatsApp quando o Supabase não está ativado;
 - suporte a `prefers-reduced-motion`.
@@ -32,7 +35,7 @@ O projeto apresenta produtos nas categorias **Kit** e **Unidade**, permite monta
 
 ## Rodando localmente
 
-Requisitos: Node.js `>=22.13.0` e npm.
+Requisitos: Node.js `22.x` e npm.
 
 ```bash
 npm install
@@ -65,8 +68,10 @@ Acesse `http://localhost:3000`.
 4. Confirme a criação de `catalog_products`, `orders` e `order_items`.
 5. Configure as variáveis de ambiente no servidor.
 
-Para um banco já existente, execute também
-[`supabase/migrations/20260720_admin_inventory.sql`](supabase/migrations/20260720_admin_inventory.sql).
+Para um banco já existente, execute em ordem
+[`supabase/migrations/20260720_admin_inventory.sql`](supabase/migrations/20260720_admin_inventory.sql)
+e
+[`supabase/migrations/20260720_dynamic_catalog.sql`](supabase/migrations/20260720_dynamic_catalog.sql).
 Depois crie o usuário administrador no Supabase Auth e adicione o UUID dele à
 tabela protegida `admin_users`. O guia completo está em
 [`ADMIN_SUPABASE.md`](ADMIN_SUPABASE.md).
@@ -82,7 +87,7 @@ O projeto já contém `vercel.json` e o script `build:vercel`.
 3. Cadastre as variáveis do `.env.example`.
 4. Execute o deploy.
 5. Faça um pedido de teste e confira o registro no Supabase.
-6. Acesse `/admin/login` e valide o gerenciamento de estoque.
+6. Acesse `/admin/login` e valide cadastro, imagem, estoque e desativação.
 
 O passo a passo completo está em [`DEPLOY_VERCEL_SUPABASE.md`](DEPLOY_VERCEL_SUPABASE.md).
 
@@ -117,4 +122,5 @@ O envio da mensagem não é automático: o cliente revisa e toca em **Enviar** n
 - taxa e prazo de entrega são confirmados no WhatsApp;
 - a Divine Flour é pronta para servir;
 - imagens do cardápio são ilustrativas;
-- produtos e preços devem ser atualizados em `lib/catalog.ts` e em `catalog_products` no Supabase.
+- produtos novos e alterações são administrados em `/admin`, sem novo deploy;
+- `lib/catalog.ts` permanece apenas como fallback seguro caso o Supabase esteja temporariamente indisponível.

@@ -635,7 +635,7 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
-  margin-top: 48px;
+  margin-top: 42px;
 }
 
 .featured-card {
@@ -683,7 +683,7 @@ button:focus-visible {
 .featured-card__visual {
   position: relative;
   display: grid;
-  min-height: 310px;
+  min-height: 250px;
   overflow: hidden;
   place-items: center;
   border-bottom: 1.5px solid var(--green-deep);
@@ -700,8 +700,8 @@ button:focus-visible {
 
 .featured-card__visual::after {
   position: absolute;
-  width: 230px;
-  height: 230px;
+  width: 190px;
+  height: 190px;
   border: 2px solid rgba(23, 48, 40, 0.18);
   border-radius: 50%;
   content: "";
@@ -713,7 +713,7 @@ button:focus-visible {
   left: 14px;
   color: rgba(23, 48, 40, 0.07);
   font-family: var(--display-accent);
-  font-size: 8rem;
+  font-size: 6.8rem;
   line-height: 1;
 }
 
@@ -721,8 +721,8 @@ button:focus-visible {
   position: relative;
   z-index: 1;
   display: block;
-  width: 78%;
-  height: 280px;
+  width: 72%;
+  height: 220px;
   object-fit: contain;
   filter: drop-shadow(0 14px 9px rgba(11, 33, 26, 0.24));
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -760,13 +760,13 @@ button:focus-visible {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 26px 24px 24px;
+  padding: 22px 20px 20px;
 }
 
 .featured-card__content h3 {
   margin: 0;
   font-family: var(--display);
-  font-size: clamp(2rem, 3vw, 2.85rem);
+  font-size: clamp(1.8rem, 2.6vw, 2.4rem);
   font-weight: 400;
   line-height: 0.95;
   letter-spacing: -0.035em;
@@ -774,9 +774,9 @@ button:focus-visible {
 }
 
 .featured-card__content > p {
-  margin: 16px 0 24px;
+  margin: 13px 0 20px;
   color: var(--muted);
-  font-size: 0.96rem;
+  font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.45;
 }
@@ -787,7 +787,7 @@ button:focus-visible {
   justify-content: space-between;
   gap: 16px;
   margin-top: auto;
-  padding-top: 20px;
+  padding-top: 16px;
   border-top: 1px solid var(--line);
 }
 
@@ -807,7 +807,7 @@ button:focus-visible {
 
 .featured-card__footer strong {
   font-family: var(--display-accent);
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 400;
   line-height: 1;
 }
@@ -953,8 +953,9 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
-  gap: 24px;
+  gap: 22px;
   margin-top: 38px;
+  scroll-margin-top: 86px;
   animation: category-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -981,8 +982,8 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 48px;
-  padding: 12px 17px 9px;
+  min-height: 44px;
+  padding: 10px 15px 8px;
   border-bottom: 1.5px solid var(--green-deep);
   font-size: 0.75rem;
   font-weight: 700;
@@ -997,7 +998,7 @@ button:focus-visible {
 .product-card__body {
   display: flex;
   width: 100%;
-  min-height: 650px;
+  min-height: 540px;
   flex-direction: column;
 }
 
@@ -1006,7 +1007,7 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 330px;
+  min-height: 250px;
   overflow: hidden;
   border-bottom: 1.5px solid var(--green-deep);
   background: var(--green);
@@ -1018,8 +1019,8 @@ button:focus-visible {
 
 .product-card__stage::before {
   position: absolute;
-  width: 245px;
-  height: 245px;
+  width: 195px;
+  height: 195px;
   border: 2px solid rgba(23, 48, 40, 0.23);
   border-radius: 50%;
   content: "";
@@ -1039,8 +1040,8 @@ button:focus-visible {
 .product-card__badges {
   position: absolute;
   z-index: 3;
-  top: 18px;
-  left: 16px;
+  top: 14px;
+  left: 14px;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
@@ -1103,8 +1104,8 @@ button:focus-visible {
   position: relative;
   z-index: 1;
   display: block;
-  width: 78%;
-  height: 290px;
+  width: 72%;
+  height: 220px;
   object-fit: contain;
   filter: drop-shadow(0 14px 9px rgba(23, 48, 40, 0.25));
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -1119,13 +1120,13 @@ button:focus-visible {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 28px 25px 24px;
+  padding: 22px 20px 20px;
 }
 
 .product-card__content h3 {
   margin: 0;
   font-family: var(--display);
-  font-size: clamp(2.15rem, 3.6vw, 3.45rem);
+  font-size: clamp(1.85rem, 2.8vw, 2.7rem);
   font-weight: 400;
   line-height: 0.94;
   letter-spacing: -0.035em;
@@ -1134,18 +1135,18 @@ button:focus-visible {
 }
 
 .product-card__description {
-  margin: 18px 0 0;
+  margin: 14px 0 0;
   color: #29473e;
-  font-size: 0.98rem;
+  font-size: 0.9rem;
   font-weight: 600;
   line-height: 1.45;
   text-wrap: pretty;
 }
 
 .product-card__detail {
-  margin: 11px 0 0;
+  margin: 9px 0 0;
   color: var(--muted);
-  font-size: 0.87rem;
+  font-size: 0.82rem;
   line-height: 1.42;
 }
 
@@ -1155,7 +1156,7 @@ button:focus-visible {
   justify-content: space-between;
   gap: 18px;
   margin-top: auto;
-  padding-top: 26px;
+  padding-top: 20px;
 }
 
 .product-card__footer > div {
@@ -1165,7 +1166,7 @@ button:focus-visible {
 
 .product-card__footer strong {
   font-family: var(--display-accent);
-  font-size: 2.5rem;
+  font-size: 2.1rem;
   font-weight: 400;
   line-height: 0.95;
 }
@@ -1213,6 +1214,105 @@ button:focus-visible {
   .product-card:hover .product-card__image {
     transform: scale(1.035);
   }
+}
+
+.catalog-empty {
+  display: grid;
+  grid-column: 1 / -1;
+  min-height: 280px;
+  padding: 44px 24px;
+  border: 1.5px dashed rgba(23, 48, 40, 0.45);
+  border-radius: 14px;
+  background: rgba(255, 253, 247, 0.66);
+  text-align: center;
+  place-items: center;
+}
+
+.catalog-empty svg {
+  width: 42px;
+  height: 42px;
+  color: var(--orange);
+}
+
+.catalog-empty h3 {
+  margin: 14px 0 0;
+  font-family: var(--display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.catalog-empty p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.catalog-pagination {
+  display: grid;
+  grid-template-columns: minmax(124px, 1fr) auto minmax(124px, 1fr);
+  align-items: center;
+  gap: 22px;
+  margin-top: 38px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.catalog-pagination > button,
+.catalog-pagination__pages button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 14px 8px;
+  border: 1.5px solid var(--green-deep);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.catalog-pagination > button:first-child {
+  justify-self: start;
+}
+
+.catalog-pagination > button:last-child {
+  justify-self: end;
+}
+
+.catalog-pagination > button:hover:not(:disabled),
+.catalog-pagination__pages button:hover,
+.catalog-pagination__pages button[aria-current="page"] {
+  background: var(--green-deep);
+  color: var(--paper);
+  transform: translateY(-2px);
+}
+
+.catalog-pagination > button:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.catalog-pagination > button svg {
+  width: 17px;
+  height: 17px;
+}
+
+.catalog-pagination__pages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.catalog-pagination__pages button {
+  width: 44px;
+  padding-inline: 8px;
 }
 
 .order {
@@ -2370,11 +2470,11 @@ footer {
   }
 
   .featured-card__visual {
-    min-height: 280px;
+    min-height: 245px;
   }
 
   .featured-card__visual img {
-    height: 250px;
+    height: 215px;
   }
 
   .catalog {
@@ -2413,15 +2513,15 @@ footer {
   }
 
   .product-card__stage {
-    min-height: 300px;
+    min-height: 240px;
   }
 
   .product-card__image {
-    height: 270px;
+    height: 210px;
   }
 
   .product-card__content h3 {
-    font-size: clamp(2.4rem, 11vw, 3.5rem);
+    font-size: clamp(2.05rem, 9vw, 2.75rem);
   }
 
   .product-card__footer {
@@ -2431,6 +2531,22 @@ footer {
 
   .product-card__footer a,
   .product-card__footer button {
+    width: 100%;
+  }
+
+  .catalog-pagination {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .catalog-pagination__pages {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    flex-wrap: wrap;
+  }
+
+  .catalog-pagination > button:first-child,
+  .catalog-pagination > button:last-child {
     width: 100%;
   }
 

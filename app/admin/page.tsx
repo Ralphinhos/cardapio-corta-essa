@@ -1,5 +1,9 @@
 import { redirect } from "next/navigation";
-import { AdminAccessDenied, AdminDashboard, type AdminProduct } from "@/app/admin/admin-dashboard";
+import { AdminAccessDenied, AdminDashboard } from "@/app/admin/admin-dashboard";
+import {
+  type AdminProduct,
+  adminProductFields,
+} from "@/app/admin/product-types";
 import { hasSupabasePublicConfig } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -34,10 +38,9 @@ export default async function AdminPage() {
 
   const { data, error } = await supabase
     .from("catalog_products")
-    .select(
-      "key, slug, category, name, weight, price_cents, stock_quantity, is_top_seller, active",
-    )
+    .select(adminProductFields)
     .order("category")
+    .order("display_order")
     .order("name");
 
   if (error) {
