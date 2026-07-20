@@ -224,7 +224,7 @@ export const productKey = (category: Category, product: Product) =>
   product.key ?? `${category}-${product.slug}`;
 
 export const productImagePath = (category: Category, product: Product) =>
-  product.imagePath ?? `/images/${product.slug}-${category}.webp`;
+  product.imagePath?.trim() || `/images/${product.slug}-${category}.webp`;
 
 export const productImageUrl = (imagePath: string) => {
   if (!imagePath || imagePath.startsWith("/") || /^https?:\/\//i.test(imagePath)) {
