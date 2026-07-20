@@ -6,7 +6,7 @@ create extension if not exists pgcrypto;
 create table if not exists public.catalog_products (
   key text primary key,
   slug text not null,
-  category text not null check (category in ('kit', 'unit')),
+  category text not null check (category in ('kit', 'unit', 'combo')),
   name text not null,
   description text not null,
   detail text,
@@ -135,7 +135,7 @@ create table if not exists public.order_items (
   order_id uuid not null references public.orders(id) on delete cascade,
   product_key text not null references public.catalog_products(key),
   name_snapshot text not null,
-  category text not null check (category in ('kit', 'unit')),
+  category text not null check (category in ('kit', 'unit', 'combo')),
   weight_snapshot text not null,
   quantity integer not null check (quantity between 1 and 20),
   unit_price_cents integer not null check (unit_price_cents > 0),

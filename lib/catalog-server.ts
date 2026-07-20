@@ -30,7 +30,7 @@ type CatalogRow = {
 };
 
 const isCategory = (value: unknown): value is Category =>
-  value === "kit" || value === "unit";
+  value === "kit" || value === "unit" || value === "combo";
 
 const isTone = (value: unknown): value is ProductTone =>
   value === "green" || value === "orange";

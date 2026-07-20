@@ -1,5 +1,28 @@
-export type Category = "kit" | "unit";
+export const catalogCategories = ["kit", "unit", "combo"] as const;
+export type Category = (typeof catalogCategories)[number];
 export type ProductTone = "green" | "orange";
+
+const categoryMetadata: Record<
+  Category,
+  { label: string; priceSuffix: string; pageLabel: string }
+> = {
+  kit: { label: "Kit", priceSuffix: "por kit", pageLabel: "kit" },
+  unit: {
+    label: "Unidade",
+    priceSuffix: "por unidade",
+    pageLabel: "unidade",
+  },
+  combo: { label: "Combo", priceSuffix: "por combo", pageLabel: "combo" },
+};
+
+export const categoryLabel = (category: Category) =>
+  categoryMetadata[category].label;
+
+export const categoryPriceSuffix = (category: Category) =>
+  categoryMetadata[category].priceSuffix;
+
+export const categoryPageLabel = (category: Category) =>
+  categoryMetadata[category].pageLabel;
 
 export type Product = {
   key?: string;

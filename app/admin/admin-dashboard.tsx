@@ -22,7 +22,12 @@ import { useMemo, useState } from "react";
 import { AdminProductForm } from "@/app/admin/product-form";
 import type { AdminProduct } from "@/app/admin/product-types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
-import { formatPrice, productImageUrl } from "@/lib/catalog";
+import {
+  catalogCategories,
+  categoryLabel,
+  formatPrice,
+  productImageUrl,
+} from "@/lib/catalog";
 
 type Feedback = { kind: "success" | "error"; message: string } | null;
 
@@ -59,7 +64,8 @@ export function AdminDashboard({
     () =>
       [...products].sort(
         (first, second) =>
-          first.category.localeCompare(second.category) ||
+          catalogCategories.indexOf(first.category) -
+            catalogCategories.indexOf(second.category) ||
           first.display_order - second.display_order ||
           first.name.localeCompare(second.name),
       ),
@@ -80,6 +86,13 @@ export function AdminDashboard({
           0,
           ...products
             .filter((product) => product.category === "unit")
+            .map((product) => product.display_order),
+        ) + 1,
+      combo:
+        Math.max(
+          0,
+          ...products
+            .filter((product) => product.category === "combo")
             .map((product) => product.display_order),
         ) + 1,
     }),
@@ -270,7 +283,7 @@ export function AdminDashboard({
                     src={productImageUrl(product.image_path)}
                     alt=""
                   />
-                  <span>{product.category === "kit" ? "Kit" : "Unidade"}</span>
+                  <span>{categoryLabel(product.category)}</span>
                   {!product.active && (
                     <em><EyeOff aria-hidden="true" /> Inativo</em>
                   )}

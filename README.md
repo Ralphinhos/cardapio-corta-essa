@@ -2,12 +2,12 @@
 
 Cardápio online da **Corta Essa!**, marca de churrasco vegetariano com identidade visual “Brasa Editorial”.
 
-O projeto apresenta produtos nas categorias **Kit** e **Unidade**, permite montar um pedido para entrega, registra o pedido no Supabase e abre o WhatsApp com a confirmação preenchida.
+O projeto apresenta produtos nas categorias **Kit**, **Unidade** e **Combo**, permite montar um pedido para entrega, registra o pedido no Supabase e abre o WhatsApp com a confirmação preenchida.
 
 ## Funcionalidades
 
 - hero editorial responsivo com imagens reais dos produtos;
-- abas acessíveis para Kit e Unidade;
+- abas acessíveis para Kit, Unidade e Combo;
 - cards com sabores, pesos e preços;
 - carrinho com controle de quantidades;
 - formulário exclusivo para entrega;
@@ -72,6 +72,9 @@ Para um banco já existente, execute em ordem
 [`supabase/migrations/20260720_admin_inventory.sql`](supabase/migrations/20260720_admin_inventory.sql)
 e
 [`supabase/migrations/20260720_dynamic_catalog.sql`](supabase/migrations/20260720_dynamic_catalog.sql).
+Em seguida, execute
+[`supabase/migrations/20260720_combo_category.sql`](supabase/migrations/20260720_combo_category.sql)
+para liberar combos no catálogo e nos pedidos.
 Depois crie o usuário administrador no Supabase Auth e adicione o UUID dele à
 tabela protegida `admin_users`. O guia completo está em
 [`ADMIN_SUPABASE.md`](ADMIN_SUPABASE.md).
@@ -103,7 +106,7 @@ npm test                # build e testes do ambiente Sites
 
 ## Fluxo do pedido
 
-1. O cliente escolhe Kit ou Unidade.
+1. O cliente escolhe Kit, Unidade ou Combo.
 2. Adiciona produtos e quantidades.
 3. Informa os dados de entrega.
 4. A aplicação registra o pedido no Supabase.
