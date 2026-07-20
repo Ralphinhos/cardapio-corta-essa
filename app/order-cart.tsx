@@ -16,6 +16,7 @@ import {
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   type CartItem,
+  categoryLabel,
   formatPrice,
   productImagePath,
   productImageUrl,
@@ -137,7 +138,7 @@ export function OrderCart({
       const itemSummary = items
         .map(
           (item) =>
-            `${item.quantity}x ${item.product.name} (${item.category === "kit" ? "Kit" : "Unidade"} · ${item.product.weight})`,
+            `${item.quantity}x ${item.product.name} (${categoryLabel(item.category)} · ${item.product.weight})`,
         )
         .join("\n");
       const address = [
@@ -256,7 +257,7 @@ export function OrderCart({
                       />
                       <div className="checkout-line__copy">
                         <h4>{item.product.name}</h4>
-                        <p>{item.category === "kit" ? "Kit" : "Unidade"} · {item.product.weight}</p>
+                        <p>{categoryLabel(item.category)} · {item.product.weight}</p>
                         <strong>{formatPrice(item.product.price * item.quantity)}</strong>
                       </div>
                       <div className="checkout-line__actions" aria-label={`Quantidade de ${item.product.name}`}>

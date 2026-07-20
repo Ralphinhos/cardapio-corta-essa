@@ -6,6 +6,8 @@ import { type FormEvent, useEffect, useState } from "react";
 import {
   type Category,
   type ProductTone,
+  catalogCategories,
+  categoryLabel,
   productImageUrl,
 } from "@/lib/catalog";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -307,8 +309,11 @@ export function AdminProductForm({
                 onChange={(event) => updateDraft({ category: event.target.value as Category })}
                 disabled={editing || submitting}
               >
-                <option value="kit">Kit</option>
-                <option value="unit">Unidade</option>
+                {catalogCategories.map((category) => (
+                  <option key={category} value={category}>
+                    {categoryLabel(category)}
+                  </option>
+                ))}
               </select>
             </label>
           </div>

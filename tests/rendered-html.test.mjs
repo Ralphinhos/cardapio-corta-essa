@@ -35,6 +35,7 @@ test("renders the optimized catalog shell", async () => {
   assert.match(html, /fetchpriority="high"/i);
   assert.doesNotMatch(html, /src="\/images\/gourmet-type\.png"/);
   assert.match(html, /src="\/images\/logo-transparent\.webp"/);
+  assert.match(html, /id="tab-combo"/);
   assert.equal(
     (html.match(/class="product-card product-card--/g) ?? []).length,
     6,

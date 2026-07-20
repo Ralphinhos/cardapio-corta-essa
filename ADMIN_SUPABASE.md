@@ -14,6 +14,9 @@ Para um Supabase que já recebeu o `supabase/schema.sql` anteriormente:
 4. confirme que a execução terminou sem erro.
 5. depois execute todo o conteúdo de
    `supabase/migrations/20260720_dynamic_catalog.sql`.
+6. por último, execute
+   `supabase/migrations/20260720_combo_category.sql` para liberar a categoria
+   Combo no catálogo e nos itens de pedido.
 
 Se o painel de estoque já está funcionando, execute somente
 `supabase/migrations/20260720_dynamic_catalog.sql`.
@@ -38,6 +41,10 @@ A segunda migration:
 - libera `INSERT` seguro para novos produtos;
 - mantém `DELETE` bloqueado: produtos são desativados para preservar pedidos;
 - migra os produtos atuais para o catálogo dinâmico.
+
+A migration de Combo amplia com segurança as restrições de categoria tanto em
+`catalog_products` quanto em `order_items`. Assim, combos cadastrados no painel
+podem ser adicionados ao carrinho e registrados normalmente nos pedidos.
 
 Os produtos existentes começam com estoque `0` por segurança. Depois do deploy,
 informe as quantidades reais pelo painel antes de divulgar o cardápio.
@@ -141,6 +148,7 @@ atualizado; basta recarregar uma aba que estava aberta.
 - `stock_quantity <= 0`: exibe “Fora de estoque” e bloqueia a compra;
 - `is_top_seller = true`: prioriza o produto nos três destaques e adiciona a tag;
 - cada aba exibe seis produtos por página;
+- Kit, Unidade e Combo usam o mesmo fluxo de estoque, destaque e pedido;
 - produto novo entra no fim da categoria e aparece sem novo deploy;
 - `active = false`: remove do cardápio e preserva pedidos antigos;
 - imagens aceitas: JPG, PNG ou WebP com até 5 MB;

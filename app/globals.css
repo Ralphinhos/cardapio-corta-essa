@@ -386,7 +386,7 @@ button:focus-visible {
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 20px;
-  width: min(450px, 100%);
+  width: min(560px, 100%);
   margin-top: 28px;
   padding-top: 20px;
   border-top: 1px solid rgba(247, 244, 236, 0.16);
@@ -402,7 +402,7 @@ button:focus-visible {
 
 .hero-selector__buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   padding: 3px;
   border: 1px solid rgba(247, 244, 236, 0.2);
   border-radius: 10px;
@@ -935,8 +935,8 @@ button:focus-visible {
 
 .catalog-tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  min-width: 366px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 520px;
   padding: 4px;
   border: 2px solid var(--green-deep);
   border-radius: 12px;
@@ -2694,6 +2694,18 @@ footer {
 
   .hero h1 {
     font-size: clamp(3.55rem, 17.2vw, 4.2rem);
+  }
+
+  .hero-selector button,
+  .catalog-tabs button {
+    gap: 5px;
+    padding-inline: 7px;
+    font-size: 0.76rem;
+  }
+
+  .catalog-tabs .catalog-tabs__count {
+    margin-left: 0;
+    font-size: 0.62rem;
   }
 
   .featured-card__topline {

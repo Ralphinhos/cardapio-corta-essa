@@ -3,6 +3,7 @@
 
 import {
   Box,
+  Boxes,
   ChevronLeft,
   ChevronRight,
   Flame,
@@ -18,6 +19,9 @@ import {
   type CartItem,
   type Category,
   type Product,
+  categoryLabel,
+  categoryPageLabel,
+  categoryPriceSuffix,
   formatPrice,
   productImagePath,
   productImageUrl,
@@ -27,6 +31,11 @@ import {
 
 const orderingEnabled = process.env.NEXT_PUBLIC_ORDERING_ENABLED === "true";
 const PAGE_SIZE = 6;
+const categoryControls = [
+  { value: "kit", label: "Kit", Icon: PackageOpen },
+  { value: "unit", label: "Unidade", Icon: Box },
+  { value: "combo", label: "Combo", Icon: Boxes },
+] as const;
 const OrderCart = dynamic(
   () => import("@/app/order-cart").then((module) => module.OrderCart),
   { ssr: false },
@@ -51,7 +60,7 @@ function ProductCard({
     >
       <div className="product-card__meta">
         <span>{String(index + 1).padStart(2, "0")}</span>
-        <span>{category === "kit" ? "Kit" : "Unidade"} · {product.weight}</span>
+        <span>{categoryLabel(category)} · {product.weight}</span>
       </div>
 
       <div className="product-card__body">
@@ -87,7 +96,7 @@ function ProductCard({
           <div className="product-card__footer">
             <div>
               <strong>{formatPrice(product.price)}</strong>
-              <span>{category === "kit" ? "por kit" : "por unidade"}</span>
+              <span>{categoryPriceSuffix(category)}</span>
             </div>
             {orderingEnabled ? (
               <button
@@ -125,20 +134,16 @@ function HeroSelector({
     <div className="hero-selector">
       <span className="hero-selector__label">Escolha o formato</span>
       <div className="hero-selector__buttons" aria-label="Exibir produtos por tipo">
-        <button
-          type="button"
-          aria-pressed={category === "kit"}
-          onClick={() => onChange("kit")}
-        >
-          <PackageOpen aria-hidden="true" /> <span>Kit</span>
-        </button>
-        <button
-          type="button"
-          aria-pressed={category === "unit"}
-          onClick={() => onChange("unit")}
-        >
-          <Box aria-hidden="true" /> <span>Unidade</span>
-        </button>
+        {categoryControls.map(({ value, label, Icon }) => (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={category === value}
+            onClick={() => onChange(value)}
+          >
+            <Icon aria-hidden="true" /> <span>{label}</span>
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -168,6 +173,7 @@ export function MenuClient({
     () => ({
       kit: initialProducts.filter((product) => product.category === "kit").length,
       unit: initialProducts.filter((product) => product.category === "unit").length,
+      combo: initialProducts.filter((product) => product.category === "combo").length,
     }),
     [initialProducts],
   );
@@ -372,7 +378,7 @@ export function MenuClient({
                           ? "Para compartilhar"
                           : "Cheio de sabor"}
                   </span>
-                  <span>{category === "kit" ? "Kit" : "Unidade"}</span>
+                  <span>{categoryLabel(category)}</span>
                 </div>
                 <div className="featured-card__visual">
                   <span className="featured-card__number">0{index + 1}</span>
@@ -427,6 +433,13 @@ export function MenuClient({
               </article>
             );
           })}
+          {featuredProducts.length === 0 && (
+            <div className="catalog-empty">
+              <Boxes aria-hidden="true" />
+              <h3>Nenhum produto ativo nesta categoria.</h3>
+              <p>Os novos itens cadastrados no painel aparecerão aqui.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -438,8 +451,8 @@ export function MenuClient({
           <div className="section-intro__copy">
             <h2 id="catalog-title">Escolha como vai para a brasa.</h2>
             <p>
-              Monte o churrasco completo ou escolha seus produtos favoritos por
-              unidade.
+              Escolha um combo, monte o churrasco completo ou peça seus produtos
+              favoritos por unidade.
             </p>
           </div>
         </div>
@@ -447,30 +460,23 @@ export function MenuClient({
         <div className="catalog__controls">
           <span>Selecione o formato</span>
           <div className="catalog-tabs" role="tablist" aria-label="Tipo de produto">
-            <button
-              type="button"
-              id="tab-kit"
-              role="tab"
-              aria-selected={category === "kit"}
-              aria-controls="panel-products"
-              onClick={() => changeCategory("kit")}
-            >
-              <PackageOpen aria-hidden="true" />
-              <span className="catalog-tabs__label">Kit</span>
-              <span className="catalog-tabs__count">{String(categoryCounts.kit).padStart(2, "0")}</span>
-            </button>
-            <button
-              type="button"
-              id="tab-unit"
-              role="tab"
-              aria-selected={category === "unit"}
-              aria-controls="panel-products"
-              onClick={() => changeCategory("unit")}
-            >
-              <Box aria-hidden="true" />
-              <span className="catalog-tabs__label">Unidade</span>
-              <span className="catalog-tabs__count">{String(categoryCounts.unit).padStart(2, "0")}</span>
-            </button>
+            {categoryControls.map(({ value, label, Icon }) => (
+              <button
+                key={value}
+                type="button"
+                id={`tab-${value}`}
+                role="tab"
+                aria-selected={category === value}
+                aria-controls="panel-products"
+                onClick={() => changeCategory(value)}
+              >
+                <Icon aria-hidden="true" />
+                <span className="catalog-tabs__label">{label}</span>
+                <span className="catalog-tabs__count">
+                  {String(categoryCounts[value]).padStart(2, "0")}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
 
@@ -478,7 +484,7 @@ export function MenuClient({
           className="product-grid"
           id="panel-products"
           role="tabpanel"
-          aria-labelledby={category === "kit" ? "tab-kit" : "tab-unit"}
+          aria-labelledby={`tab-${category}`}
           key={`${category}-${page}`}
         >
           {visibleProducts.map((product, index) => (
@@ -500,7 +506,7 @@ export function MenuClient({
         </div>
 
         {totalPages > 1 && (
-          <nav className="catalog-pagination" aria-label={`Páginas de produtos em ${category === "kit" ? "kit" : "unidade"}`}>
+          <nav className="catalog-pagination" aria-label={`Páginas de produtos em ${categoryPageLabel(category)}`}>
             <button
               type="button"
               onClick={() => changePage(page - 1)}
