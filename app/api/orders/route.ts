@@ -144,9 +144,17 @@ export async function POST(request: Request) {
   }
 
   if (rpcError) {
+    console.error("[orders] Falha ao registrar pedido:", rpcError.message);
+    const stockConflict = /estoque insuficiente|produto indisponível/i.test(
+      rpcError.message,
+    );
     return NextResponse.json(
-      { error: "Não foi possível registrar o pedido. Tente novamente." },
-      { status: 500, headers: noStore },
+      {
+        error: stockConflict
+          ? "Um dos produtos ficou sem estoque. Atualize o cardápio e revise o pedido."
+          : "Não foi possível registrar o pedido. Tente novamente.",
+      },
+      { status: stockConflict ? 409 : 500, headers: noStore },
     );
   }
 

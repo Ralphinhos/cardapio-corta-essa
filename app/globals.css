@@ -728,6 +728,34 @@ button:focus-visible {
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.featured-card__stock {
+  position: absolute;
+  z-index: 3;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 11px 7px;
+  border-radius: 4px;
+  background: var(--green-deeper);
+  color: var(--paper);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.featured-card__stock svg {
+  width: 15px;
+  height: 15px;
+}
+
+.featured-card--sold-out .featured-card__visual img {
+  filter: grayscale(0.55) drop-shadow(0 14px 9px rgba(11, 33, 26, 0.16));
+  opacity: 0.58;
+}
+
 .featured-card__content {
   display: flex;
   flex: 1;
@@ -785,7 +813,8 @@ button:focus-visible {
 }
 
 .featured-card__footer a,
-.featured-card__footer button {
+.featured-card__footer button,
+.featured-card__unavailable {
   display: inline-flex;
   align-items: center;
   gap: 14px;
@@ -798,6 +827,23 @@ button:focus-visible {
   cursor: pointer;
   font-size: 0.86rem;
   font-weight: 700;
+}
+
+.featured-card__footer button:disabled,
+.product-card__footer button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.featured-card__unavailable,
+.product-card__unavailable {
+  cursor: not-allowed;
+}
+
+.featured-card__unavailable svg,
+.product-card__unavailable svg {
+  width: 16px;
+  height: 16px;
 }
 
 .featured-card__footer button svg,
@@ -990,11 +1036,22 @@ button:focus-visible {
   content: "";
 }
 
-.product-card__stamp {
+.product-card__badges {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
   top: 18px;
   left: 16px;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-card__stamp,
+.product-card__highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   padding: 7px 10px 5px;
   border: 1px solid rgba(23, 48, 40, 0.18);
   border-radius: 3px;
@@ -1006,6 +1063,42 @@ button:focus-visible {
   transform: rotate(-2deg);
 }
 
+.product-card__highlight {
+  border-color: var(--green-deeper);
+  background: var(--green-deeper);
+  color: var(--paper);
+  transform: rotate(1deg);
+}
+
+.product-card__highlight svg {
+  width: 13px;
+  height: 13px;
+  color: var(--green);
+}
+
+.product-card__stock {
+  position: absolute;
+  z-index: 4;
+  right: 16px;
+  bottom: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 7px;
+  border-radius: 4px;
+  background: var(--green-deeper);
+  color: var(--paper);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.product-card__stock svg {
+  width: 16px;
+  height: 16px;
+}
+
 .product-card__image {
   position: relative;
   z-index: 1;
@@ -1015,6 +1108,11 @@ button:focus-visible {
   object-fit: contain;
   filter: drop-shadow(0 14px 9px rgba(23, 48, 40, 0.25));
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-card--sold-out .product-card__image {
+  filter: grayscale(0.55) drop-shadow(0 14px 9px rgba(23, 48, 40, 0.15));
+  opacity: 0.58;
 }
 
 .product-card__content {
@@ -1082,7 +1180,8 @@ button:focus-visible {
 }
 
 .product-card__footer a,
-.product-card__footer button {
+.product-card__footer button,
+.product-card__unavailable {
   display: inline-flex;
   align-items: center;
   justify-content: space-between;
@@ -1099,7 +1198,8 @@ button:focus-visible {
 }
 
 .product-card--orange .product-card__footer a,
-.product-card--orange .product-card__footer button {
+.product-card--orange .product-card__footer button,
+.product-card--orange .product-card__unavailable {
   background: var(--orange);
   color: var(--green-deeper);
 }
@@ -1686,6 +1786,16 @@ footer {
 .checkout-line__actions button:hover {
   background: var(--green-deep);
   color: var(--paper);
+}
+
+.checkout-line__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
+.checkout-line__actions button:disabled:hover {
+  background: transparent;
+  color: inherit;
 }
 
 .checkout-line__actions button svg {

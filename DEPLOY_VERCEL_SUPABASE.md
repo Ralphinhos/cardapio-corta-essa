@@ -62,6 +62,8 @@ Na raiz do projeto, crie `.env.local` a partir de `.env.example` e substitua os 
 NEXT_PUBLIC_ORDERING_ENABLED=true
 SUPABASE_URL=https://SEU-PROJETO.supabase.co
 SUPABASE_SECRET_KEY=sb_secret_SUA_CHAVE_REAL
+NEXT_PUBLIC_SUPABASE_URL=https://SEU-PROJETO.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_SUA_CHAVE_PUBLICA
 NEXT_PUBLIC_WHATSAPP_NUMBER=5535910222015
 ```
 
@@ -117,6 +119,8 @@ O arquivo `.env.local` não entra no commit porque está ignorado. Confira isso 
 | `NEXT_PUBLIC_ORDERING_ENABLED` | `true` |
 | `SUPABASE_URL` | URL do projeto Supabase |
 | `SUPABASE_SECRET_KEY` | chave secreta `sb_secret_...` |
+| `NEXT_PUBLIC_SUPABASE_URL` | a mesma URL do projeto Supabase |
+| `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | chave pública `sb_publishable_...` |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | `5535910222015` |
 
 7. Clique em **Deploy**.
@@ -124,6 +128,14 @@ O arquivo `.env.local` não entra no commit porque está ignorado. Confira isso 
 A integração com GitHub cria novos deploys automaticamente a cada `git push`. Consulte a [documentação oficial de deploy por Git](https://vercel.com/docs/git) e de [variáveis de ambiente](https://vercel.com/docs/environment-variables).
 
 Se alterar qualquer variável depois do primeiro deploy, abra **Deployments** e faça um novo deploy para que o valor seja incorporado à aplicação.
+
+## Painel administrativo e estoque
+
+Para habilitar `/admin`, execute a migration
+`supabase/migrations/20260720_admin_inventory.sql`, crie o usuário em
+**Authentication → Users** e autorize seu UUID em `admin_users`. Consulte
+[`ADMIN_SUPABASE.md`](ADMIN_SUPABASE.md) para o procedimento completo e os SQLs
+de verificação.
 
 ## 6. Teste de produção obrigatório
 
@@ -224,4 +236,3 @@ Abra os logs do deploy, confirme Node.js compatível com o `package.json` e rode
 - `vercel.json`: comando de build da Vercel;
 - `.env.example`: nomes das variáveis, sem segredos;
 - `public/images/gourmet-type.png`: tipografia transparente do hero.
-

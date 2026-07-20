@@ -1,20 +1,7 @@
--- Corta Essa! — estrutura mínima para pedidos de entrega.
--- Execute este arquivo uma única vez no SQL Editor de um projeto Supabase novo.
+-- Painel administrativo, estoque e destaques.
+-- Execute no SQL Editor do projeto Supabase já existente.
 
-create extension if not exists pgcrypto;
-
-create table if not exists public.catalog_products (
-  key text primary key,
-  slug text not null,
-  category text not null check (category in ('kit', 'unit')),
-  name text not null,
-  weight text not null,
-  price_cents integer not null check (price_cents > 0),
-  stock_quantity integer not null default 0 check (stock_quantity >= 0),
-  is_top_seller boolean not null default false,
-  active boolean not null default true,
-  updated_at timestamptz not null default now()
-);
+begin;
 
 alter table public.catalog_products
   add column if not exists stock_quantity integer not null default 0;
@@ -37,90 +24,15 @@ begin
 end;
 $$;
 
-insert into public.catalog_products (key, slug, category, name, weight, price_cents)
-values
-  ('kit-divine', 'divine', 'kit', 'Divine Flour', '2 unidades de 150 g', 3500),
-  ('kit-gold', 'gold', 'kit', 'Gold Marinade', '270 g', 4200),
-  ('kit-red', 'red', 'kit', 'Red Hot Marinade', '270 g', 4200),
-  ('kit-persian', 'persian', 'kit', 'Persian Barbecue', '300 g', 4200),
-  ('kit-turkish', 'turkish', 'kit', 'Turkish Skewer', '300 g', 4200),
-  ('kit-tropical', 'tropical', 'kit', 'Tropical Flavor', '360 g', 4200),
-  ('kit-creamy', 'creamy', 'kit', 'Creamy Orange', '380 g', 4200),
-  ('kit-petite', 'petite', 'kit', 'Petite Zucchini', '380 g', 4200),
-  ('kit-deep', 'deep', 'kit', 'Deep Purple', '360 g', 4800),
-  ('unit-divine', 'divine', 'unit', 'Divine Flour', '150 g', 1800),
-  ('unit-gold', 'gold', 'unit', 'Gold Marinade', '90 g', 1500),
-  ('unit-red', 'red', 'unit', 'Red Hot Marinade', '90 g', 1500),
-  ('unit-persian', 'persian', 'unit', 'Persian Barbecue', '100 g', 1500),
-  ('unit-turkish', 'turkish', 'unit', 'Turkish Skewer', '100 g', 1500),
-  ('unit-tropical', 'tropical', 'unit', 'Tropical Flavor', '100 g', 1500),
-  ('unit-creamy', 'creamy', 'unit', 'Creamy Orange', '130 g', 1500),
-  ('unit-petite', 'petite', 'unit', 'Petite Zucchini', '130 g', 1500),
-  ('unit-deep', 'deep', 'unit', 'Deep Purple', '120 g', 1800)
-on conflict (key) do update set
-  slug = excluded.slug,
-  category = excluded.category,
-  name = excluded.name,
-  weight = excluded.weight,
-  price_cents = excluded.price_cents,
-  updated_at = now();
-
-create table if not exists public.orders (
-  id uuid primary key default gen_random_uuid(),
-  order_number bigint generated always as identity unique,
-  status text not null default 'new'
-    check (status in ('new', 'whatsapp_pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled')),
-  delivery_type text not null default 'delivery' check (delivery_type = 'delivery'),
-  customer_name text not null,
-  phone text not null,
-  postal_code text not null,
-  street text not null,
-  address_number text not null,
-  complement text,
-  neighborhood text not null,
-  city text not null,
-  state text not null,
-  reference text,
-  notes text,
-  subtotal_cents integer not null default 0 check (subtotal_cents >= 0),
-  delivery_fee_cents integer,
-  total_cents integer not null default 0 check (total_cents >= 0),
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.order_items (
-  id bigint generated always as identity primary key,
-  order_id uuid not null references public.orders(id) on delete cascade,
-  product_key text not null references public.catalog_products(key),
-  name_snapshot text not null,
-  category text not null check (category in ('kit', 'unit')),
-  weight_snapshot text not null,
-  quantity integer not null check (quantity between 1 and 20),
-  unit_price_cents integer not null check (unit_price_cents > 0),
-  subtotal_cents integer not null check (subtotal_cents > 0),
-  created_at timestamptz not null default now()
-);
-
 create table if not exists public.admin_users (
   user_id uuid primary key references auth.users(id) on delete cascade,
   created_at timestamptz not null default now()
 );
 
-create index if not exists orders_status_created_at_idx
-  on public.orders (status, created_at desc);
-
-create index if not exists order_items_order_id_idx
-  on public.order_items (order_id);
-
 alter table public.catalog_products enable row level security;
-alter table public.orders enable row level security;
-alter table public.order_items enable row level security;
 alter table public.admin_users enable row level security;
 
 revoke all on table public.catalog_products from anon, authenticated;
-revoke all on table public.orders from anon, authenticated;
-revoke all on table public.order_items from anon, authenticated;
 revoke all on table public.admin_users from anon, authenticated;
 
 grant select on table public.catalog_products to anon, authenticated;
@@ -317,10 +229,10 @@ begin
 end;
 $$;
 
-revoke all on function public.create_server_order(jsonb, jsonb) from public, anon, authenticated;
+revoke all on function public.create_server_order(jsonb, jsonb)
+  from public, anon, authenticated;
 grant execute on function public.create_server_order(jsonb, jsonb) to service_role;
 
-comment on function public.create_server_order(jsonb, jsonb) is
-  'Registra pedidos de entrega usando preços oficiais do catálogo. Uso exclusivo do servidor.';
-
 notify pgrst, 'reload schema';
+
+commit;
