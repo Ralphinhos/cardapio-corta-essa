@@ -1,15 +1,27 @@
 export type Category = "kit" | "unit";
+export type ProductTone = "green" | "orange";
 
 export type Product = {
+  key?: string;
   slug: string;
   name: string;
   description: string;
   detail?: string;
+  badgeText?: string;
   weight: string;
   price: number;
-  tone: "green" | "orange";
+  tone: ProductTone;
+  imagePath?: string;
+  displayOrder?: number;
   stockQuantity?: number | null;
   isTopSeller?: boolean;
+};
+
+export type CatalogProduct = Product & {
+  key: string;
+  category: Category;
+  imagePath: string;
+  displayOrder: number;
 };
 
 export type CartItem = {
@@ -182,6 +194,25 @@ export const units: Product[] = [
   },
 ];
 
+const withCatalogMetadata = (
+  category: Category,
+  products: Product[],
+): CatalogProduct[] =>
+  products.map((product, index) => ({
+    ...product,
+    key: `${category}-${product.slug}`,
+    category,
+    imagePath: `/images/${product.slug}-${category}.webp`,
+    displayOrder: index + 1,
+    badgeText:
+      product.slug === "divine" ? "Pronta para servir" : "Feito para a brasa",
+  }));
+
+export const fallbackCatalog: CatalogProduct[] = [
+  ...withCatalogMetadata("kit", kits),
+  ...withCatalogMetadata("unit", units),
+];
+
 export const formatPrice = (price: number) =>
   new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -190,7 +221,25 @@ export const formatPrice = (price: number) =>
   }).format(price);
 
 export const productKey = (category: Category, product: Product) =>
-  `${category}-${product.slug}`;
+  product.key ?? `${category}-${product.slug}`;
+
+export const productImagePath = (category: Category, product: Product) =>
+  product.imagePath ?? `/images/${product.slug}-${category}.webp`;
+
+export const productImageUrl = (imagePath: string) => {
+  if (!imagePath || imagePath.startsWith("/") || /^https?:\/\//i.test(imagePath)) {
+    return imagePath;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+  if (!supabaseUrl) return "";
+
+  const encodedPath = imagePath
+    .split("/")
+    .map((part) => encodeURIComponent(part))
+    .join("/");
+  return `${supabaseUrl}/storage/v1/object/public/product-images/${encodedPath}`;
+};
 
 export const whatsappNumber =
   process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "5535910222015";

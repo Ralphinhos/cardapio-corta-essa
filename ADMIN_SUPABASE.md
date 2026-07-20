@@ -1,7 +1,7 @@
-# Painel administrativo, Supabase Auth e estoque
+# Painel administrativo, catálogo dinâmico e Supabase Auth
 
 Este guia ativa o painel `/admin`, a autenticação por e-mail e senha, a gestão de
-estoque e os destaques do cardápio.
+estoque, destaques, imagens e cadastro de produtos.
 
 ## 1. Atualizar o banco
 
@@ -12,6 +12,11 @@ Para um Supabase que já recebeu o `supabase/schema.sql` anteriormente:
    `supabase/migrations/20260720_admin_inventory.sql`;
 3. cole no editor e clique em **Run**;
 4. confirme que a execução terminou sem erro.
+5. depois execute todo o conteúdo de
+   `supabase/migrations/20260720_dynamic_catalog.sql`.
+
+Se o painel de estoque já está funcionando, execute somente
+`supabase/migrations/20260720_dynamic_catalog.sql`.
 
 Em um projeto Supabase novo, execute somente o `supabase/schema.sql` atualizado,
 pois ele já contém a mesma estrutura.
@@ -24,6 +29,15 @@ A migration:
 - permite atualizar estoque/destaque apenas ao usuário autenticado presente na
   allowlist;
 - valida e decrementa o estoque dentro da transação do pedido.
+
+A segunda migration:
+
+- adiciona descrição, detalhe, imagem, cor e ordem de exibição ao catálogo;
+- cria o bucket público `product-images` com limite de 5 MB;
+- permite upload e alteração somente ao administrador da allowlist;
+- libera `INSERT` seguro para novos produtos;
+- mantém `DELETE` bloqueado: produtos são desativados para preservar pedidos;
+- migra os produtos atuais para o catálogo dinâmico.
 
 Os produtos existentes começam com estoque `0` por segurança. Depois do deploy,
 informe as quantidades reais pelo painel antes de divulgar o cardápio.
@@ -116,7 +130,7 @@ Depois de salvar, abra **Deployments**, escolha o último deploy e clique em
 2. entre com o e-mail e a senha criados no Supabase;
 3. configure o estoque real de cada produto;
 4. ative os produtos que devem aparecer como “Destaque da casa”;
-5. salve cada card alterado;
+5. use **Adicionar produto** para testar um cadastro com imagem;
 6. abra o cardápio em outra aba e confirme as mudanças.
 
 O cardápio é renderizado dinamicamente. Um novo acesso já recebe o estoque
@@ -126,6 +140,10 @@ atualizado; basta recarregar uma aba que estava aberta.
 
 - `stock_quantity <= 0`: exibe “Fora de estoque” e bloqueia a compra;
 - `is_top_seller = true`: prioriza o produto nos três destaques e adiciona a tag;
+- cada aba exibe seis produtos por página;
+- produto novo entra no fim da categoria e aparece sem novo deploy;
+- `active = false`: remove do cardápio e preserva pedidos antigos;
+- imagens aceitas: JPG, PNG ou WebP com até 5 MB;
 - ao registrar um pedido, o banco bloqueia as linhas dos produtos, valida o
   saldo e desconta as quantidades atomicamente;
 - se duas pessoas tentarem comprar a última unidade, somente o pedido que
@@ -136,9 +154,9 @@ atualizado; basta recarregar uma aba que estava aberta.
 ## 8. Verificações rápidas
 
 ```sql
-select key, name, stock_quantity, is_top_seller
+select key, name, stock_quantity, is_top_seller, active, display_order
   from public.catalog_products
- order by category, name;
+ order by category, display_order;
 ```
 
 ```sql
@@ -165,7 +183,12 @@ o SQL da seção 3 com o e-mail correto.
 
 ### Salvar retorna erro de permissão
 
-Execute novamente a migration e confirme as policies com o SQL da seção 8.
+Execute novamente as duas migrations e confirme as policies com o SQL da seção 8.
+
+### Upload da imagem falha
+
+Confirme em **Storage** se o bucket público `product-images` existe. Se não
+existir, execute novamente `20260720_dynamic_catalog.sql`.
 
 ### Pedido retorna erro 500
 

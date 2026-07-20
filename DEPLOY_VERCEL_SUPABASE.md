@@ -132,7 +132,8 @@ Se alterar qualquer variável depois do primeiro deploy, abra **Deployments** e 
 ## Painel administrativo e estoque
 
 Para habilitar `/admin`, execute a migration
-`supabase/migrations/20260720_admin_inventory.sql`, crie o usuário em
+`supabase/migrations/20260720_admin_inventory.sql` e depois
+`supabase/migrations/20260720_dynamic_catalog.sql`, crie o usuário em
 **Authentication → Users** e autorize seu UUID em `admin_users`. Consulte
 [`ADMIN_SUPABASE.md`](ADMIN_SUPABASE.md) para o procedimento completo e os SQLs
 de verificação.
@@ -170,15 +171,16 @@ O valor de entrega fica para confirmação no WhatsApp. O total salvo inicialmen
 
 ## 8. Atualização de produtos e preços
 
-Nesta versão, o catálogo visual está em `lib/catalog.ts` e os preços seguros estão em `catalog_products` no Supabase. Ao alterar produto, peso ou preço:
+O catálogo publicado vem do Supabase. Em `/admin`, o usuário autorizado pode:
 
-1. atualize `lib/catalog.ts`;
-2. atualize o mesmo registro em `catalog_products` no Supabase;
-3. execute `npm run build:vercel`;
-4. publique o commit;
-5. faça um pedido de teste.
+1. cadastrar produto e imagem;
+2. editar texto, peso, preço e cor do card;
+3. controlar estoque e destaque;
+4. desativar um produto sem apagar o histórico.
 
-Essa duplicação é intencional neste MVP: a página continua rápida e o banco continua sendo a autoridade no momento de registrar o pedido. Uma fase posterior pode incluir painel administrativo e catálogo totalmente carregado do Supabase.
+As alterações aparecem após recarregar o cardápio e não exigem commit ou novo
+deploy. Cada aba mostra seis produtos por página. `lib/catalog.ts` funciona
+somente como fallback durante indisponibilidade ou antes da migration.
 
 ## 9. Domínio próprio
 

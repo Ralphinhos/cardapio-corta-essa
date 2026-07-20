@@ -17,6 +17,8 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
   type CartItem,
   formatPrice,
+  productImagePath,
+  productImageUrl,
   productKey,
   whatsappNumber,
 } from "@/lib/catalog";
@@ -247,7 +249,9 @@ export function OrderCart({
                   {items.map((item) => (
                     <article className="checkout-line" key={productKey(item.category, item.product)}>
                       <img
-                        src={`/images/${item.product.slug}-${item.category}.webp`}
+                        src={productImageUrl(
+                          productImagePath(item.category, item.product),
+                        )}
                         alt=""
                       />
                       <div className="checkout-line__copy">

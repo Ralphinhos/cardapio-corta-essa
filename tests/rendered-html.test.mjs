@@ -29,5 +29,12 @@ test("renders development preview metadata", async () => {
     response.headers.get("content-type") ?? "",
     /^text\/html\b/i,
   );
-  assert.match(await response.text(), developmentPreviewMeta);
+  const html = await response.text();
+  assert.match(html, developmentPreviewMeta);
+  assert.equal(
+    (html.match(/class="product-card product-card--/g) ?? []).length,
+    6,
+    "a primeira página deve renderizar seis produtos",
+  );
+  assert.match(html, /class="catalog-pagination"/);
 });

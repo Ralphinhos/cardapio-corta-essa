@@ -3,6 +3,8 @@
 
 import {
   Box,
+  ChevronLeft,
+  ChevronRight,
   Flame,
   PackageOpen,
   PackageX,
@@ -11,19 +13,20 @@ import {
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { OrderCart } from "@/app/order-cart";
-import type { CatalogInventory } from "@/lib/catalog-server";
 import {
+  type CatalogProduct,
   type CartItem,
   type Category,
   type Product,
   formatPrice,
-  kits,
+  productImagePath,
+  productImageUrl,
   productKey,
-  units,
   whatsappUrl,
 } from "@/lib/catalog";
 
 const orderingEnabled = process.env.NEXT_PUBLIC_ORDERING_ENABLED === "true";
+const PAGE_SIZE = 6;
 
 function ProductCard({
   product,
@@ -36,7 +39,7 @@ function ProductCard({
   index: number;
   onAdd: (product: Product, category: Category) => void;
 }) {
-  const image = `/images/${product.slug}-${category}.webp`;
+  const image = productImageUrl(productImagePath(category, product));
   const outOfStock = product.stockQuantity != null && product.stockQuantity <= 0;
   return (
     <article
@@ -51,7 +54,7 @@ function ProductCard({
         <div className="product-card__stage">
           <div className="product-card__badges">
             <span className="product-card__stamp">
-              {product.slug === "divine" ? "Pronta para servir" : "Feito para a brasa"}
+              {product.badgeText ?? "Feito para a brasa"}
             </span>
             {product.isTopSeller && (
               <span className="product-card__highlight">
@@ -137,29 +140,36 @@ function HeroSelector({
 }
 
 export function MenuClient({
-  initialInventory,
+  initialProducts,
 }: {
-  initialInventory: CatalogInventory[];
+  initialProducts: CatalogProduct[];
 }) {
   const [category, setCategory] = useState<Category>("kit");
+  const [currentPage, setCurrentPage] = useState(1);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
-  const inventoryByKey = useMemo(
-    () => new Map(initialInventory.map((item) => [item.key, item])),
-    [initialInventory],
-  );
   const products = useMemo(
     () =>
-      (category === "kit" ? kits : units).map((product) => {
-        const inventory = inventoryByKey.get(productKey(category, product));
-        return {
-          ...product,
-          stockQuantity: inventory?.stock_quantity ?? null,
-          isTopSeller: inventory?.is_top_seller ?? false,
-        };
-      }),
-    [category, inventoryByKey],
+      initialProducts
+        .filter((product) => product.category === category)
+        .sort(
+          (first, second) =>
+            first.displayOrder - second.displayOrder ||
+            first.name.localeCompare(second.name),
+        ),
+    [category, initialProducts],
   );
+  const categoryCounts = useMemo(
+    () => ({
+      kit: initialProducts.filter((product) => product.category === "kit").length,
+      unit: initialProducts.filter((product) => product.category === "unit").length,
+    }),
+    [initialProducts],
+  );
+  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
+  const page = Math.min(currentPage, totalPages);
+  const pageStart = (page - 1) * PAGE_SIZE;
+  const visibleProducts = products.slice(pageStart, pageStart + PAGE_SIZE);
   const featuredProducts = useMemo(
     () =>
       [...products]
@@ -170,6 +180,23 @@ export function MenuClient({
         .slice(0, 3),
     [products],
   );
+
+  const changeCategory = (nextCategory: Category) => {
+    setCategory(nextCategory);
+    setCurrentPage(1);
+  };
+
+  const changePage = (nextPage: number) => {
+    setCurrentPage(Math.min(Math.max(nextPage, 1), totalPages));
+    window.requestAnimationFrame(() => {
+      document.getElementById("panel-products")?.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "auto"
+          : "smooth",
+        block: "start",
+      });
+    });
+  };
 
   const addToCart = (product: Product, itemCategory: Category) => {
     if (product.stockQuantity != null && product.stockQuantity <= 0) return;
@@ -255,7 +282,7 @@ export function MenuClient({
                 Fazer encomenda <span aria-hidden="true">↗</span>
               </a>
             </div>
-            <HeroSelector category={category} onChange={setCategory} />
+            <HeroSelector category={category} onChange={changeCategory} />
           </div>
 
           <div className="hero-collage" aria-hidden="true">
@@ -292,7 +319,7 @@ export function MenuClient({
               product.stockQuantity != null && product.stockQuantity <= 0;
             return (
               <article
-                key={product.slug}
+                key={product.key}
                 className={`featured-card${outOfStock ? " featured-card--sold-out" : ""}`}
               >
                 <div className="featured-card__topline">
@@ -317,7 +344,7 @@ export function MenuClient({
                     </span>
                   )}
                   <img
-                    src={`/images/${product.slug}-${category}.webp`}
+                    src={productImageUrl(productImagePath(category, product))}
                     alt={`${product.name}: ${product.description}`}
                     loading="eager"
                   />
@@ -387,11 +414,11 @@ export function MenuClient({
               role="tab"
               aria-selected={category === "kit"}
               aria-controls="panel-products"
-              onClick={() => setCategory("kit")}
+              onClick={() => changeCategory("kit")}
             >
               <PackageOpen aria-hidden="true" />
               <span className="catalog-tabs__label">Kit</span>
-              <span className="catalog-tabs__count">{String(kits.length).padStart(2, "0")}</span>
+              <span className="catalog-tabs__count">{String(categoryCounts.kit).padStart(2, "0")}</span>
             </button>
             <button
               type="button"
@@ -399,11 +426,11 @@ export function MenuClient({
               role="tab"
               aria-selected={category === "unit"}
               aria-controls="panel-products"
-              onClick={() => setCategory("unit")}
+              onClick={() => changeCategory("unit")}
             >
               <Box aria-hidden="true" />
               <span className="catalog-tabs__label">Unidade</span>
-              <span className="catalog-tabs__count">{String(units.length).padStart(2, "0")}</span>
+              <span className="catalog-tabs__count">{String(categoryCounts.unit).padStart(2, "0")}</span>
             </button>
           </div>
         </div>
@@ -413,18 +440,63 @@ export function MenuClient({
           id="panel-products"
           role="tabpanel"
           aria-labelledby={category === "kit" ? "tab-kit" : "tab-unit"}
-          key={category}
+          key={`${category}-${page}`}
         >
-          {products.map((product, index) => (
+          {visibleProducts.map((product, index) => (
             <ProductCard
-              key={product.slug}
+              key={product.key}
               product={product}
               category={category}
-              index={index}
+              index={pageStart + index}
               onAdd={addToCart}
             />
           ))}
+          {visibleProducts.length === 0 && (
+            <div className="catalog-empty">
+              <PackageX aria-hidden="true" />
+              <h3>Nenhum produto ativo nesta categoria.</h3>
+              <p>Novos itens cadastrados no painel aparecerão aqui.</p>
+            </div>
+          )}
         </div>
+
+        {totalPages > 1 && (
+          <nav className="catalog-pagination" aria-label={`Páginas de produtos em ${category === "kit" ? "kit" : "unidade"}`}>
+            <button
+              type="button"
+              onClick={() => changePage(page - 1)}
+              disabled={page === 1}
+              aria-label="Página anterior"
+            >
+              <ChevronLeft aria-hidden="true" />
+              <span>Anterior</span>
+            </button>
+            <div className="catalog-pagination__pages">
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (pageNumber) => (
+                  <button
+                    type="button"
+                    key={pageNumber}
+                    onClick={() => changePage(pageNumber)}
+                    aria-current={pageNumber === page ? "page" : undefined}
+                    aria-label={`Ir para página ${pageNumber}`}
+                  >
+                    {String(pageNumber).padStart(2, "0")}
+                  </button>
+                ),
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={() => changePage(page + 1)}
+              disabled={page === totalPages}
+              aria-label="Próxima página"
+            >
+              <span>Próxima</span>
+              <ChevronRight aria-hidden="true" />
+            </button>
+          </nav>
+        )}
       </section>
 
       <section className="order" id="encomendas" aria-labelledby="order-title">
