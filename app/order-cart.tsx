@@ -3,7 +3,9 @@
 
 import {
   Box,
+  CalendarDays,
   Check,
+  Clock3,
   LoaderCircle,
   MapPin,
   MessageCircle,
@@ -32,6 +34,7 @@ type OrderResult = {
 };
 
 type Confirmation = OrderResult & {
+  deliveryLabel: string;
   whatsappUrl: string;
 };
 
@@ -49,6 +52,22 @@ type OrderCartProps = {
 const inputValue = (formData: FormData, name: string) =>
   String(formData.get(name) ?? "").trim();
 
+const getTodayInSaoPaulo = () => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values.year}-${values.month}-${values.day}`;
+};
+
+const formatDeliveryDate = (date: string) => {
+  const [year, month, day] = date.split("-");
+  return `${day}/${month}/${year}`;
+};
+
 export function OrderCart({
   items,
   open,
@@ -63,6 +82,7 @@ export function OrderCart({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
+  const minimumDeliveryDate = useMemo(() => getTodayInSaoPaulo(), []);
 
   const itemCount = items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = useMemo(
@@ -108,6 +128,8 @@ export function OrderCart({
       neighborhood: inputValue(formData, "neighborhood"),
       city: inputValue(formData, "city"),
       state: inputValue(formData, "state").toUpperCase(),
+      requested_delivery_date: inputValue(formData, "requested_delivery_date"),
+      requested_delivery_time: inputValue(formData, "requested_delivery_time"),
       reference: inputValue(formData, "reference"),
       notes: inputValue(formData, "notes"),
     };
@@ -151,12 +173,14 @@ export function OrderCart({
       ]
         .filter(Boolean)
         .join(" · ");
+      const deliveryLabel = `${formatDeliveryDate(customer.requested_delivery_date)} às ${customer.requested_delivery_time}`;
       const message = [
         `Olá! Quero confirmar o pedido ${result.order_number}.`,
         "",
         itemSummary,
         "",
         `Total: ${formatPrice(result.total_cents / 100)}`,
+        `Entrega desejada: ${deliveryLabel}`,
         `Entrega: ${address}`,
         customer.reference ? `Referência: ${customer.reference}` : "",
         customer.notes ? `Observações: ${customer.notes}` : "",
@@ -166,6 +190,7 @@ export function OrderCart({
 
       setConfirmation({
         ...result,
+        deliveryLabel,
         whatsappUrl: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
       });
       form.reset();
@@ -221,6 +246,9 @@ export function OrderCart({
               <p>
                 Seu pedido já está salvo. Agora envie a mensagem para confirmarmos
                 disponibilidade e entrega pelo WhatsApp.
+              </p>
+              <p className="checkout-success__delivery">
+                <CalendarDays aria-hidden="true" /> Entrega desejada: {confirmation.deliveryLabel}
               </p>
               <strong>{formatPrice(confirmation.total_cents / 100)}</strong>
               <a href={confirmation.whatsappUrl} target="_blank" rel="noreferrer">
@@ -328,6 +356,28 @@ export function OrderCart({
                     <span>WhatsApp</span>
                     <input name="phone" type="tel" autoComplete="tel" inputMode="tel" maxLength={30} placeholder="(35) 99999-9999" required />
                   </label>
+                  <label className="checkout-field checkout-field--half">
+                    <span><CalendarDays aria-hidden="true" /> Dia desejado</span>
+                    <input
+                      name="requested_delivery_date"
+                      type="date"
+                      min={minimumDeliveryDate}
+                      aria-describedby="checkout-schedule-note"
+                      required
+                    />
+                  </label>
+                  <label className="checkout-field checkout-field--half">
+                    <span><Clock3 aria-hidden="true" /> Horário desejado</span>
+                    <input
+                      name="requested_delivery_time"
+                      type="time"
+                      aria-describedby="checkout-schedule-note"
+                      required
+                    />
+                  </label>
+                  <p className="checkout-schedule-note" id="checkout-schedule-note">
+                    Data e horário desejados, sujeitos à confirmação pelo WhatsApp.
+                  </p>
                   <label className="checkout-field">
                     <span>CEP</span>
                     <input name="postal_code" autoComplete="postal-code" inputMode="numeric" maxLength={12} placeholder="00000-000" required />
