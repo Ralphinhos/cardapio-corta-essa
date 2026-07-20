@@ -75,6 +75,9 @@ e
 Em seguida, execute
 [`supabase/migrations/20260720_combo_category.sql`](supabase/migrations/20260720_combo_category.sql)
 para liberar combos no catálogo e nos pedidos.
+Por último, execute
+[`supabase/migrations/20260720_edit_product_category.sql`](supabase/migrations/20260720_edit_product_category.sql)
+para permitir que o administrador mova um produto entre as três categorias.
 Depois crie o usuário administrador no Supabase Auth e adicione o UUID dele à
 tabela protegida `admin_users`. O guia completo está em
 [`ADMIN_SUPABASE.md`](ADMIN_SUPABASE.md).
@@ -126,4 +129,5 @@ O envio da mensagem não é automático: o cliente revisa e toca em **Enviar** n
 - a Divine Flour é pronta para servir;
 - imagens do cardápio são ilustrativas;
 - produtos novos e alterações são administrados em `/admin`, sem novo deploy;
+- produtos podem mudar de categoria sem perder referências de pedidos antigos;
 - `lib/catalog.ts` permanece apenas como fallback seguro caso o Supabase esteja temporariamente indisponível.
