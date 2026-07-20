@@ -101,4 +101,3 @@ O envio da mensagem não é automático: o cliente revisa e toca em **Enviar** n
 - a Divine Flour é pronta para servir;
 - imagens do cardápio são ilustrativas;
 - produtos e preços devem ser atualizados em `lib/catalog.ts` e em `catalog_products` no Supabase.
-
