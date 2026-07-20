@@ -4,7 +4,7 @@ import test from "node:test";
 const developmentPreviewMeta =
   /<meta(?=[^>]*\bname=["']codex-preview["'])(?=[^>]*\bcontent=["']development["'])[^>]*>/i;
 
-test("renders development preview metadata", async () => {
+test("renders the optimized catalog shell", async () => {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
@@ -31,6 +31,10 @@ test("renders development preview metadata", async () => {
   );
   const html = await response.text();
   assert.match(html, developmentPreviewMeta);
+  assert.match(html, /src="\/images\/gourmet-type\.webp"/);
+  assert.match(html, /fetchpriority="high"/i);
+  assert.doesNotMatch(html, /src="\/images\/gourmet-type\.png"/);
+  assert.match(html, /src="\/images\/logo-transparent\.webp"/);
   assert.equal(
     (html.match(/class="product-card product-card--/g) ?? []).length,
     6,

@@ -1,9 +1,4 @@
 import type { Metadata } from "next";
-import "@fontsource/anton/400.css";
-import "@fontsource/bebas-neue/400.css";
-import "@fontsource/josefin-sans/400.css";
-import "@fontsource/josefin-sans/600.css";
-import "@fontsource/josefin-sans/700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,6 +21,29 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <head>
+        <link
+          rel="preload"
+          href="/fonts/anton-400.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/josefin-sans-600.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/josefin-sans-700.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body>{children}</body>
     </html>
   );
