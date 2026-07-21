@@ -12,6 +12,27 @@ const isRecord = (value: unknown): value is UnknownRecord =>
 const cleanText = (value: unknown, maxLength: number) =>
   typeof value === "string" ? value.trim().slice(0, maxLength) : "";
 
+const isValidDeliveryDate = (value: string) => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+};
+
+const isValidDeliveryTime = (value: string) =>
+  /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+
+const getTodayInSaoPaulo = () => {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Sao_Paulo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+  return `${values.year}-${values.month}-${values.day}`;
+};
+
 const noStore = { "Cache-Control": "no-store" };
 
 export async function POST(request: Request) {
@@ -75,6 +96,8 @@ export async function POST(request: Request) {
     neighborhood: cleanText(payload.customer.neighborhood, 100),
     city: cleanText(payload.customer.city, 100),
     state: cleanText(payload.customer.state, 2).toUpperCase(),
+    requested_delivery_date: cleanText(payload.customer.requested_delivery_date, 10),
+    requested_delivery_time: cleanText(payload.customer.requested_delivery_time, 5),
     reference: cleanText(payload.customer.reference, 180),
     notes: cleanText(payload.customer.notes, 600),
   };
@@ -93,6 +116,30 @@ export async function POST(request: Request) {
   if (requiredCustomerFields.some((field) => !field)) {
     return NextResponse.json(
       { error: "Preencha os dados obrigatórios para entrega." },
+      { status: 400, headers: noStore },
+    );
+  }
+
+  if (!customer.requested_delivery_date || !customer.requested_delivery_time) {
+    return NextResponse.json(
+      { error: "Informe o dia e o horário desejados para a entrega." },
+      { status: 400, headers: noStore },
+    );
+  }
+
+  if (
+    !isValidDeliveryDate(customer.requested_delivery_date) ||
+    !isValidDeliveryTime(customer.requested_delivery_time)
+  ) {
+    return NextResponse.json(
+      { error: "Escolha uma data e um horário válidos para a entrega." },
+      { status: 400, headers: noStore },
+    );
+  }
+
+  if (customer.requested_delivery_date < getTodayInSaoPaulo()) {
+    return NextResponse.json(
+      { error: "Escolha hoje ou uma data futura para a entrega." },
       { status: 400, headers: noStore },
     );
   }
@@ -148,13 +195,18 @@ export async function POST(request: Request) {
     const stockConflict = /estoque insuficiente|produto indisponível/i.test(
       rpcError.message,
     );
+    const scheduleConflict = /data de entrega|horário de entrega/i.test(
+      rpcError.message,
+    );
     return NextResponse.json(
       {
         error: stockConflict
           ? "Um dos produtos ficou sem estoque. Atualize o cardápio e revise o pedido."
+          : scheduleConflict
+            ? "Revise o dia e o horário desejados para a entrega."
           : "Não foi possível registrar o pedido. Tente novamente.",
       },
-      { status: stockConflict ? 409 : 500, headers: noStore },
+      { status: stockConflict ? 409 : scheduleConflict ? 400 : 500, headers: noStore },
     );
   }
 

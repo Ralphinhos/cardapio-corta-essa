@@ -20,6 +20,8 @@ Para um Supabase que já recebeu o `supabase/schema.sql` anteriormente:
 7. por último, execute
    `supabase/migrations/20260720_edit_product_category.sql` para permitir a
    alteração de categoria durante a edição.
+8. execute `supabase/migrations/20260720_delivery_schedule.sql` para adicionar
+   a data e o horário desejados ao registro dos pedidos.
 
 Se o painel de estoque já está funcionando, execute somente
 `supabase/migrations/20260720_dynamic_catalog.sql`.
@@ -52,6 +54,11 @@ podem ser adicionados ao carrinho e registrados normalmente nos pedidos.
 A migration de edição libera apenas a coluna `category` para atualização pelo
 administrador já protegido pela allowlist e pelas políticas RLS. A chave do
 produto permanece igual, preservando referências de pedidos anteriores.
+
+A migration de agenda preserva os pedidos antigos, adiciona os campos
+`requested_delivery_date` e `requested_delivery_time` e passa a exigir esses
+dados em cada novo pedido. Datas anteriores ao dia atual de São Paulo são
+rejeitadas no servidor e no banco.
 
 Os produtos existentes começam com estoque `0` por segurança. Depois do deploy,
 informe as quantidades reais pelo painel antes de divulgar o cardápio.
@@ -162,6 +169,8 @@ atualizado; basta recarregar uma aba que estava aberta.
 - imagens aceitas: JPG, PNG ou WebP com até 5 MB;
 - ao registrar um pedido, o banco bloqueia as linhas dos produtos, valida o
   saldo e desconta as quantidades atomicamente;
+- cada novo pedido registra o dia e o horário solicitados pelo cliente; a
+  confirmação final continua sendo feita pelo WhatsApp;
 - se duas pessoas tentarem comprar a última unidade, somente o pedido que
   obtiver o estoque primeiro é registrado;
 - como a reserva ocorre antes da confirmação no WhatsApp, um pedido cancelado

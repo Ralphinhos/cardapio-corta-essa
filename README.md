@@ -78,6 +78,9 @@ para liberar combos no catálogo e nos pedidos.
 Por último, execute
 [`supabase/migrations/20260720_edit_product_category.sql`](supabase/migrations/20260720_edit_product_category.sql)
 para permitir que o administrador mova um produto entre as três categorias.
+Depois, execute
+[`supabase/migrations/20260720_delivery_schedule.sql`](supabase/migrations/20260720_delivery_schedule.sql)
+para registrar o dia e o horário desejados para cada entrega.
 Depois crie o usuário administrador no Supabase Auth e adicione o UUID dele à
 tabela protegida `admin_users`. O guia completo está em
 [`ADMIN_SUPABASE.md`](ADMIN_SUPABASE.md).
@@ -111,10 +114,10 @@ npm test                # build e testes do ambiente Sites
 
 1. O cliente escolhe Kit, Unidade ou Combo.
 2. Adiciona produtos e quantidades.
-3. Informa os dados de entrega.
+3. Informa endereço, dia e horário desejados para a entrega.
 4. A aplicação registra o pedido no Supabase.
 5. O cliente recebe um código como `CE-000001`.
-6. O WhatsApp abre com o resumo para confirmação.
+6. O WhatsApp abre com produtos, endereço e agenda desejada para confirmação.
 
 O estoque é verificado e decrementado na mesma transação que cria o pedido. Um
 produto com estoque zero continua visível, mas aparece como indisponível e não
@@ -125,7 +128,7 @@ O envio da mensagem não é automático: o cliente revisa e toca em **Enviar** n
 ## Observações
 
 - atendimento somente por entrega;
-- taxa e prazo de entrega são confirmados no WhatsApp;
+- taxa, dia e horário desejados para a entrega são confirmados no WhatsApp;
 - a Divine Flour é pronta para servir;
 - imagens do cardápio são ilustrativas;
 - produtos novos e alterações são administrados em `/admin`, sem novo deploy;

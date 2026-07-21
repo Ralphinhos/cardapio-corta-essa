@@ -112,6 +112,8 @@ create table if not exists public.orders (
   status text not null default 'new'
     check (status in ('new', 'whatsapp_pending', 'confirmed', 'preparing', 'out_for_delivery', 'delivered', 'cancelled')),
   delivery_type text not null default 'delivery' check (delivery_type = 'delivery'),
+  requested_delivery_date date not null,
+  requested_delivery_time time without time zone not null,
   customer_name text not null,
   phone text not null,
   postal_code text not null,
@@ -314,6 +316,10 @@ declare
   v_neighborhood text := nullif(btrim(coalesce(p_customer ->> 'neighborhood', '')), '');
   v_city text := nullif(btrim(coalesce(p_customer ->> 'city', '')), '');
   v_state text := upper(nullif(btrim(coalesce(p_customer ->> 'state', '')), ''));
+  v_delivery_date_text text := nullif(btrim(coalesce(p_customer ->> 'requested_delivery_date', '')), '');
+  v_delivery_time_text text := nullif(btrim(coalesce(p_customer ->> 'requested_delivery_time', '')), '');
+  v_requested_delivery_date date;
+  v_requested_delivery_time time without time zone;
   v_reference text := nullif(btrim(coalesce(p_customer ->> 'reference', '')), '');
   v_notes text := nullif(btrim(coalesce(p_customer ->> 'notes', '')), '');
 begin
@@ -325,6 +331,32 @@ begin
      or jsonb_array_length(p_items) < 1
      or jsonb_array_length(p_items) > 40 then
     raise exception 'Itens do pedido inválidos';
+  end if;
+
+  if v_delivery_date_text is null
+     or v_delivery_date_text !~ '^\d{4}-\d{2}-\d{2}$' then
+    raise exception 'Data de entrega inválida';
+  end if;
+
+  if v_delivery_time_text is null
+     or v_delivery_time_text !~ '^([01]\d|2[0-3]):[0-5]\d$' then
+    raise exception 'Horário de entrega inválido';
+  end if;
+
+  begin
+    v_requested_delivery_date := v_delivery_date_text::date;
+  exception when others then
+    raise exception 'Data de entrega inválida';
+  end;
+
+  begin
+    v_requested_delivery_time := v_delivery_time_text::time;
+  exception when others then
+    raise exception 'Horário de entrega inválido';
+  end;
+
+  if v_requested_delivery_date < timezone('America/Sao_Paulo', now())::date then
+    raise exception 'Data de entrega não pode estar no passado';
   end if;
 
   if v_name is null or char_length(v_name) > 120
@@ -343,6 +375,8 @@ begin
 
   insert into public.orders (
     status,
+    requested_delivery_date,
+    requested_delivery_time,
     customer_name,
     phone,
     postal_code,
@@ -356,6 +390,8 @@ begin
     notes
   ) values (
     'whatsapp_pending',
+    v_requested_delivery_date,
+    v_requested_delivery_time,
     v_name,
     v_phone,
     v_postal_code,
@@ -441,6 +477,8 @@ begin
   return jsonb_build_object(
     'order_id', v_order_id,
     'order_number', 'CE-' || lpad(v_order_number::text, 6, '0'),
+    'requested_delivery_date', to_char(v_requested_delivery_date, 'YYYY-MM-DD'),
+    'requested_delivery_time', to_char(v_requested_delivery_time, 'HH24:MI'),
     'total_cents', v_total
   );
 end;
