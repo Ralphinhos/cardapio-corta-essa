@@ -11,7 +11,6 @@ import {
   PackageOpen,
   PackageX,
   ShoppingBag,
-  Sparkles,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
@@ -43,6 +42,21 @@ const OrderCart = dynamic(
   { ssr: false },
 );
 
+function TopSellerMedal() {
+  return (
+    <span className="top-seller-medal">
+      <span className="top-seller-medal__ribbons" aria-hidden="true" />
+      <span className="top-seller-medal__rosette">
+        <span className="top-seller-medal__seal">
+          <Flame aria-hidden="true" />
+          <strong>Mais</strong>
+          <span>vendido</span>
+        </span>
+      </span>
+    </span>
+  );
+}
+
 function ProductCard({
   product,
   category,
@@ -71,12 +85,8 @@ function ProductCard({
             <span className="product-card__stamp">
               {product.badgeText ?? "Feito para a brasa"}
             </span>
-            {product.isTopSeller && (
-              <span className="product-card__highlight">
-                <Sparkles aria-hidden="true" /> Destaque da casa
-              </span>
-            )}
           </div>
+          {product.isTopSeller && <TopSellerMedal />}
           {outOfStock && (
             <span className="product-card__stock" role="status">
               <PackageX aria-hidden="true" /> Fora de estoque
@@ -268,7 +278,11 @@ export function MenuClient({
           </a>
           <nav aria-label="Navegação principal">
             <a href="#cardapio">Cardápio</a>
-            <a href="/clube">Clube</a>
+            <a className="topbar__club-link" href="/clube">
+              <Flame aria-hidden="true" />
+              <span>Clube</span>
+              <span className="topbar__club-tag">Novo</span>
+            </a>
             <a className="topbar__secondary-link" href="#encomendas">Encomendas</a>
             <a
               className="topbar__social"
@@ -380,7 +394,7 @@ export function MenuClient({
                     className={`featured-card__badge featured-card__badge--${index}`}
                   >
                     {product.isTopSeller
-                      ? "Destaque da casa"
+                      ? "Favorito da brasa"
                       : index === 0
                         ? "Mais pedido"
                         : index === 1
@@ -391,6 +405,7 @@ export function MenuClient({
                 </div>
                 <div className="featured-card__visual">
                   <span className="featured-card__number">0{index + 1}</span>
+                  {product.isTopSeller && <TopSellerMedal />}
                   {outOfStock && (
                     <span className="featured-card__stock">
                       <PackageX aria-hidden="true" /> Fora de estoque
