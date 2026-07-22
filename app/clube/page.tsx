@@ -122,7 +122,7 @@ export default function ClubPage() {
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>
               <span aria-hidden="true" />
-              Clube Corta Essa! · somente 40 vagas
+              Clube Corta Essa!
             </div>
             <h1>
               <span>Sua brasa.</span>
