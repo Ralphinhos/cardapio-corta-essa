@@ -42,21 +42,6 @@ const OrderCart = dynamic(
   { ssr: false },
 );
 
-function TopSellerMedal() {
-  return (
-    <span className="top-seller-medal">
-      <span className="top-seller-medal__ribbons" aria-hidden="true" />
-      <span className="top-seller-medal__rosette">
-        <span className="top-seller-medal__seal">
-          <Flame aria-hidden="true" />
-          <strong>Mais</strong>
-          <span>vendido</span>
-        </span>
-      </span>
-    </span>
-  );
-}
-
 function ProductCard({
   product,
   category,
@@ -86,7 +71,6 @@ function ProductCard({
               {product.badgeText ?? "Feito para a brasa"}
             </span>
           </div>
-          {product.isTopSeller && <TopSellerMedal />}
           {outOfStock && (
             <span className="product-card__stock" role="status">
               <PackageX aria-hidden="true" /> Fora de estoque
@@ -281,7 +265,6 @@ export function MenuClient({
             <a className="topbar__club-link" href="/clube">
               <Flame aria-hidden="true" />
               <span>Clube</span>
-              <span className="topbar__club-tag">Novo</span>
             </a>
             <a className="topbar__secondary-link" href="#encomendas">Encomendas</a>
             <a
@@ -405,7 +388,6 @@ export function MenuClient({
                 </div>
                 <div className="featured-card__visual">
                   <span className="featured-card__number">0{index + 1}</span>
-                  {product.isTopSeller && <TopSellerMedal />}
                   {outOfStock && (
                     <span className="featured-card__stock">
                       <PackageX aria-hidden="true" /> Fora de estoque

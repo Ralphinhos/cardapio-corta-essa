@@ -93,6 +93,15 @@ export default function ClubPage() {
   return (
     <main className={styles.page}>
       <section className={styles.hero} id="inicio">
+        <img
+          className={styles.heroGhostWord}
+          src="/images/mensal-type.webp"
+          width="1600"
+          height="800"
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+        />
         <header className={styles.header}>
           <Link className={styles.logo} href="/" aria-label="Voltar ao cardápio Corta Essa!">
             <img
@@ -244,16 +253,22 @@ export default function ClubPage() {
             >
               <div className={styles.planTopline}>
                 <span>{plan.level}</span>
-                {plan.featured ? (
-                  <span className={styles.featuredTag}>
-                    <Flame aria-hidden="true" />
-                    Campeão de vendas
-                  </span>
-                ) : (
-                  <span>Clube</span>
-                )}
+                {!plan.featured && <span>Clube</span>}
               </div>
-              <div className={styles.planTitle}>
+              {plan.featured && (
+                <img
+                  className={styles.featuredMedal}
+                  src="/images/club-champion-medal.webp"
+                  width="512"
+                  height="512"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Campeão de vendas"
+                />
+              )}
+              <div
+                className={`${styles.planTitle}${plan.featured ? ` ${styles.planTitleFeatured}` : ""}`}
+              >
                 <h3>{plan.name}</h3>
                 <p>{plan.profile}</p>
               </div>
