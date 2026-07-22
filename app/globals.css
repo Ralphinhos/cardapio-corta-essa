@@ -2783,6 +2783,10 @@ footer {
 }
 
 @media (max-width: 420px) {
+  .topbar__secondary-link {
+    display: none;
+  }
+
   .topbar nav {
     gap: 12px;
     font-size: 0.76rem;
