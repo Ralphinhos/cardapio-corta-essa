@@ -183,6 +183,56 @@ button:focus-visible {
   transform-origin: left;
 }
 
+.topbar nav > .topbar__club-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 11px 12px 9px;
+  border: 1.5px solid rgba(127, 196, 41, 0.82);
+  border-radius: 999px;
+  background: rgba(127, 196, 41, 0.09);
+  box-shadow: 0 0 0 3px rgba(127, 196, 41, 0.06);
+  transition: background-color 180ms ease, border-color 180ms ease,
+    box-shadow 180ms ease, color 180ms ease, transform 180ms ease;
+}
+
+.topbar nav > .topbar__club-link::after {
+  display: none;
+}
+
+.topbar__club-link > svg {
+  width: 17px;
+  height: 17px;
+  color: var(--orange);
+  fill: currentColor;
+  stroke-width: 1.8;
+}
+
+.topbar__club-tag {
+  padding: 5px 7px 3px;
+  border-radius: 999px;
+  background: var(--orange);
+  color: var(--paper);
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.topbar nav > .topbar__club-link:hover {
+  border-color: var(--green);
+  background: var(--green);
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.2);
+  color: var(--green-deeper);
+  transform: translateY(-2px);
+}
+
+.topbar nav > .topbar__club-link:hover > svg {
+  color: var(--orange-dark);
+}
+
 .topbar__social {
   display: grid;
   width: 42px;
@@ -769,6 +819,109 @@ button:focus-visible {
   transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.top-seller-medal {
+  position: absolute;
+  z-index: 6;
+  top: 10px;
+  right: 12px;
+  display: block;
+  width: 92px;
+  height: 112px;
+  filter: drop-shadow(0 7px 5px rgba(11, 33, 26, 0.25));
+  pointer-events: none;
+  transform: rotate(3deg);
+  transform-origin: 50% 18%;
+}
+
+.top-seller-medal__ribbons {
+  position: absolute;
+  z-index: 0;
+  top: 61px;
+  left: 25px;
+  width: 42px;
+  height: 46px;
+}
+
+.top-seller-medal__ribbons::before,
+.top-seller-medal__ribbons::after {
+  position: absolute;
+  top: 0;
+  width: 24px;
+  height: 46px;
+  border: 1px solid #681f12;
+  background: linear-gradient(90deg, #9f2c16 0 24%, var(--orange) 24% 76%, #a92816 76%);
+  clip-path: polygon(5% 0, 95% 0, 82% 100%, 52% 79%, 17% 100%);
+  content: "";
+}
+
+.top-seller-medal__ribbons::before {
+  left: 0;
+  transform: rotate(8deg);
+  transform-origin: top right;
+}
+
+.top-seller-medal__ribbons::after {
+  right: 0;
+  transform: rotate(-8deg);
+  transform-origin: top left;
+}
+
+.top-seller-medal__rosette {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 86px;
+  height: 86px;
+  margin: 0 auto;
+  place-items: center;
+  background: var(--orange);
+  clip-path: polygon(50% 0, 59% 7%, 69% 3%, 76% 12%, 87% 13%, 89% 24%, 98% 31%, 94% 41%, 100% 50%, 94% 59%, 98% 69%, 89% 76%, 87% 87%, 76% 88%, 69% 97%, 59% 93%, 50% 100%, 41% 93%, 31% 97%, 24% 88%, 13% 87%, 11% 76%, 2% 69%, 6% 59%, 0 50%, 6% 41%, 2% 31%, 11% 24%, 13% 13%, 24% 12%, 31% 3%, 41% 7%);
+}
+
+.top-seller-medal__seal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  height: 66px;
+  border: 2px solid var(--green);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #db4a24 0, #ad2c17 72%);
+  box-shadow: inset 0 0 0 3px rgba(247, 244, 236, 0.2),
+    0 0 0 2px rgba(11, 33, 26, 0.28);
+  color: var(--paper);
+  flex-direction: column;
+  font-family: var(--display-accent);
+  line-height: 0.78;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.top-seller-medal__seal > svg {
+  width: 13px;
+  height: 13px;
+  margin-bottom: 3px;
+  color: var(--green);
+  fill: currentColor;
+  stroke-width: 1.8;
+}
+
+.top-seller-medal__seal > strong,
+.top-seller-medal__seal > span {
+  display: block;
+  font-weight: 400;
+  letter-spacing: 0.055em;
+}
+
+.top-seller-medal__seal > strong {
+  font-size: 0.88rem;
+}
+
+.top-seller-medal__seal > span {
+  margin-top: 3px;
+  font-size: 0.7rem;
+}
+
 .featured-card__stock {
   position: absolute;
   z-index: 3;
@@ -1122,8 +1275,7 @@ button:focus-visible {
   gap: 8px;
 }
 
-.product-card__stamp,
-.product-card__highlight {
+.product-card__stamp {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1136,19 +1288,6 @@ button:focus-visible {
   letter-spacing: 0.035em;
   text-transform: uppercase;
   transform: rotate(-2deg);
-}
-
-.product-card__highlight {
-  border-color: var(--green-deeper);
-  background: var(--green-deeper);
-  color: var(--paper);
-  transform: rotate(1deg);
-}
-
-.product-card__highlight svg {
-  width: 13px;
-  height: 13px;
-  color: var(--green);
 }
 
 .product-card__stock {
@@ -2477,6 +2616,17 @@ footer {
     font-size: 0.82rem;
   }
 
+  .topbar nav > .topbar__club-link {
+    gap: 6px;
+    min-height: 40px;
+    padding: 9px 10px 7px;
+  }
+
+  .topbar__club-link > svg {
+    width: 15px;
+    height: 15px;
+  }
+
   .topbar__social {
     display: none;
   }
@@ -2790,6 +2940,14 @@ footer {
   .topbar nav {
     gap: 12px;
     font-size: 0.76rem;
+  }
+
+  .topbar__club-tag {
+    display: none;
+  }
+
+  .topbar nav > .topbar__club-link {
+    padding-inline: 9px;
   }
 
   .hero h1 {
