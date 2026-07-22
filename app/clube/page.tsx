@@ -242,10 +242,16 @@ export default function ClubPage() {
               className={`${styles.planCard}${plan.featured ? ` ${styles.planCardFeatured}` : ""}`}
               key={plan.name}
             >
-              {plan.featured && <span className={styles.featuredTag}>Campeão de vendas</span>}
               <div className={styles.planTopline}>
                 <span>{plan.level}</span>
-                {plan.featured ? <Flame aria-hidden="true" /> : <span>Clube</span>}
+                {plan.featured ? (
+                  <span className={styles.featuredTag}>
+                    <Flame aria-hidden="true" />
+                    Campeão de vendas
+                  </span>
+                ) : (
+                  <span>Clube</span>
+                )}
               </div>
               <div className={styles.planTitle}>
                 <h3>{plan.name}</h3>
