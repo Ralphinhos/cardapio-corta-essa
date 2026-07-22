@@ -268,7 +268,8 @@ export function MenuClient({
           </a>
           <nav aria-label="Navegação principal">
             <a href="#cardapio">Cardápio</a>
-            <a href="#encomendas">Encomendas</a>
+            <a href="/clube">Clube</a>
+            <a className="topbar__secondary-link" href="#encomendas">Encomendas</a>
             <a
               className="topbar__social"
               href="https://www.instagram.com/cortaessachurrascovegetariano/"
@@ -612,6 +613,7 @@ export function MenuClient({
           <nav className="footer__nav" aria-label="Navegação do rodapé">
             <span>Navegue</span>
             <a href="#cardapio">Cardápio</a>
+            <a href="/clube">Clube de assinaturas</a>
             <a href="#encomendas">Encomendas</a>
           </nav>
           <div className="footer__links">
