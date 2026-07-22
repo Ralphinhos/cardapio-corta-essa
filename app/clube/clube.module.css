@@ -150,7 +150,7 @@
   font-family: var(--display);
   font-size: clamp(5.4rem, 7.8vw, 7.15rem);
   font-weight: 400;
-  line-height: 1.02;
+  line-height: 1.16;
   letter-spacing: -0.045em;
   text-transform: uppercase;
 }
@@ -458,7 +458,7 @@
 }
 
 .kicker {
-  margin: 0 0 15px;
+  margin: 0 0 22px;
   color: var(--orange-dark);
   font-size: 0.78rem;
   font-weight: 700;
@@ -487,16 +487,16 @@
   margin: 0;
   font-family: var(--display);
   font-weight: 400;
-  line-height: 1.03;
+  line-height: 1.15;
   letter-spacing: -0.04em;
   text-transform: uppercase;
   text-wrap: balance;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
 }
 
 .introCopy h2 {
   max-width: 760px;
-  font-size: clamp(4.5rem, 7vw, 6.6rem);
+  font-size: clamp(4.2rem, 6.6vw, 6.1rem);
 }
 
 .introCopy > p:last-child {
@@ -537,11 +537,11 @@
 .masterSelection h3 {
   margin: 9px 0 0;
   font-family: var(--display);
-  font-size: clamp(2.1rem, 3.2vw, 3rem);
+  font-size: clamp(2.05rem, 2.9vw, 2.7rem);
   font-weight: 400;
-  line-height: 1.06;
+  line-height: 1.17;
   text-transform: uppercase;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
 }
 
 .masterSelection p {
@@ -626,22 +626,29 @@
 }
 
 .featuredTag {
-  position: absolute;
-  z-index: 2;
-  top: 25px;
-  right: -24px;
-  width: 190px;
-  padding: 9px 10px 7px;
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px 5px;
+  border-radius: 999px;
   background: var(--orange);
   color: var(--paper);
-  font-size: 0.61rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.05em;
+  line-height: 1;
+  letter-spacing: 0.045em;
   text-align: center;
   text-transform: uppercase;
-  rotate: 42deg;
   white-space: nowrap;
+}
+
+.featuredTag svg {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 auto;
+  fill: currentcolor;
+  color: currentcolor;
 }
 
 .planTopline {
@@ -663,13 +670,6 @@
   color: var(--orange-dark);
 }
 
-.planTopline svg {
-  width: 20px;
-  height: 20px;
-  fill: var(--orange);
-  color: var(--orange);
-}
-
 .planTitle {
   padding: 28px 22px 23px;
 }
@@ -679,10 +679,10 @@
   font-family: var(--display);
   font-size: clamp(2.35rem, 3.5vw, 3.4rem);
   font-weight: 400;
-  line-height: 1.04;
+  line-height: 1.14;
   letter-spacing: -0.035em;
   text-transform: uppercase;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
 }
 
 .planTitle p {
@@ -880,7 +880,7 @@
   font-family: var(--display);
   font-size: clamp(1.85rem, 2.8vw, 2.6rem);
   font-weight: 400;
-  line-height: 1.06;
+  line-height: 1.14;
   text-transform: uppercase;
 }
 
@@ -1050,7 +1050,7 @@
   cursor: pointer;
   font-family: var(--display);
   font-size: clamp(1.65rem, 2.5vw, 2.35rem);
-  line-height: 1.08;
+  line-height: 1.14;
   list-style: none;
   text-transform: uppercase;
 }
@@ -1211,7 +1211,7 @@
   font-family: var(--display);
   font-size: clamp(2.4rem, 4vw, 4rem);
   font-weight: 400;
-  line-height: 1.04;
+  line-height: 1.14;
   text-transform: uppercase;
 }
 
@@ -1478,7 +1478,7 @@
 
   .hero h1 {
     font-size: clamp(4.25rem, 19vw, 5.6rem);
-    line-height: 1.02;
+    line-height: 1.16;
   }
 
   .heroActions {
@@ -1557,7 +1557,7 @@
   .choiceCopy h2,
   .faqHeading h2,
   .finalCta h2 {
-    font-size: clamp(3.35rem, 15vw, 4.75rem);
+    font-size: clamp(3.2rem, 14vw, 4.35rem);
   }
 
   .masterSelection {
@@ -1566,7 +1566,7 @@
   }
 
   .masterSelection h3 {
-    font-size: clamp(2rem, 11vw, 2.7rem);
+    font-size: clamp(1.95rem, 10vw, 2.45rem);
   }
 
   .plansHeading {
@@ -1703,10 +1703,8 @@
   }
 
   .featuredTag {
-    top: 24px;
-    right: -28px;
-    width: 184px;
-    font-size: 0.58rem;
+    padding-inline: 8px;
+    font-size: 0.54rem;
   }
 
   .choiceProduct {
