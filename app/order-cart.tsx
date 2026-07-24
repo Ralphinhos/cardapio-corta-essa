@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { trackMetaEvent } from "@/app/meta-pixel";
 import {
   type CartItem,
   categoryLabel,
@@ -193,6 +194,17 @@ export function OrderCart({
         deliveryLabel,
         whatsappUrl: `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`,
       });
+      trackMetaEvent("Lead", {
+        content_name: "Pedido registrado",
+        content_category: "Cardápio",
+        content_ids: items.map((item) =>
+          productKey(item.category, item.product),
+        ),
+        content_type: "product",
+        currency: "BRL",
+        num_items: itemCount,
+        value: result.total_cents / 100,
+      });
       form.reset();
       onOrderPlaced();
     } catch (submitError) {
@@ -251,7 +263,19 @@ export function OrderCart({
                 <CalendarDays aria-hidden="true" /> Entrega desejada: {confirmation.deliveryLabel}
               </p>
               <strong>{formatPrice(confirmation.total_cents / 100)}</strong>
-              <a href={confirmation.whatsappUrl} target="_blank" rel="noreferrer">
+              <a
+                href={confirmation.whatsappUrl}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() =>
+                  trackMetaEvent("Contact", {
+                    content_name: "Confirmação de pedido",
+                    content_category: "Cardápio",
+                    currency: "BRL",
+                    value: confirmation.total_cents / 100,
+                  })
+                }
+              >
                 <MessageCircle aria-hidden="true" />
                 Confirmar no WhatsApp
               </a>
