@@ -13,6 +13,7 @@ import {
   Truck,
   WalletCards,
 } from "lucide-react";
+import { MetaTrackedLink } from "@/app/meta-tracked-link";
 import { whatsappNumber } from "@/lib/catalog";
 import styles from "./clube.module.css";
 
@@ -138,14 +139,19 @@ export default function ClubPage() {
                 Conhecer os planos
                 <span aria-hidden="true">↓</span>
               </a>
-              <a
+              <MetaTrackedLink
                 className={styles.secondaryAction}
                 href={clubWhatsAppUrl()}
                 target="_blank"
                 rel="noreferrer"
+                metaEvent="Contact"
+                metaParameters={{
+                  content_name: "Clube Corta Essa",
+                  content_category: "Clube de assinaturas",
+                }}
               >
                 Falar sobre o Clube <span aria-hidden="true">↗</span>
-              </a>
+              </MetaTrackedLink>
             </div>
             <div className={styles.heroNote}>
               <MapPin aria-hidden="true" />
@@ -287,14 +293,29 @@ export default function ClubPage() {
                   </li>
                 ))}
               </ul>
-              <a
+              <MetaTrackedLink
                 href={clubWhatsAppUrl(plan.name)}
                 target="_blank"
                 rel="noreferrer"
                 aria-label={`Quero assinar o ${plan.name}`}
+                metaEvent="InitiateCheckout"
+                metaParameters={{
+                  content_name: plan.name,
+                  content_category: "Clube de assinaturas",
+                  content_ids: [plan.name.toLowerCase().replaceAll(" ", "-")],
+                  content_type: "product",
+                  currency: "BRL",
+                  num_items: 1,
+                  value: plan.price,
+                }}
+                secondaryMetaEvent="Contact"
+                secondaryMetaParameters={{
+                  content_name: plan.name,
+                  content_category: "Clube de assinaturas",
+                }}
               >
                 Quero este plano <ChevronRight aria-hidden="true" />
-              </a>
+              </MetaTrackedLink>
             </article>
           ))}
         </div>
@@ -440,9 +461,18 @@ export default function ClubPage() {
             todos os meses.
           </p>
         </div>
-        <a href={clubWhatsAppUrl()} target="_blank" rel="noreferrer">
+        <MetaTrackedLink
+          href={clubWhatsAppUrl()}
+          target="_blank"
+          rel="noreferrer"
+          metaEvent="Contact"
+          metaParameters={{
+            content_name: "Clube Corta Essa",
+            content_category: "Clube de assinaturas",
+          }}
+        >
           Quero entrar para o Clube <ChevronRight aria-hidden="true" />
-        </a>
+        </MetaTrackedLink>
       </section>
 
       <footer className={styles.footer}>
