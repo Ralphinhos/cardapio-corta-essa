@@ -10,6 +10,16 @@ const CONSENT_STORAGE_KEY = "corta-essa-cookie-consent";
 const CONSENT_CHANGE_EVENT = "corta-essa-cookie-consent-change";
 
 type ConsentChoice = "accepted" | "rejected";
+export type MetaEventName =
+  | "AddToCart"
+  | "Contact"
+  | "InitiateCheckout"
+  | "Lead"
+  | "ViewContent";
+export type MetaEventParameters = Record<
+  string,
+  string | number | boolean | string[] | Record<string, unknown>[]
+>;
 type MetaPixelFunction = {
   (...args: unknown[]): void;
   callMethod?: (...args: unknown[]) => void;
@@ -24,6 +34,7 @@ declare global {
     fbq?: MetaPixelFunction;
     _fbq?: MetaPixelFunction;
     __cortaEssaMetaPixelInitialized?: boolean;
+    __cortaEssaMetaLastPageView?: string;
   }
 }
 
@@ -68,6 +79,22 @@ function initializeMetaPixel() {
   return fbq;
 }
 
+function hasAdvertisingConsent() {
+  return window.localStorage.getItem(CONSENT_STORAGE_KEY) === "accepted";
+}
+
+export function trackMetaEvent(
+  eventName: MetaEventName,
+  parameters?: MetaEventParameters,
+) {
+  if (typeof window === "undefined" || !hasAdvertisingConsent()) return false;
+
+  const fbq = initializeMetaPixel();
+  fbq("consent", "grant");
+  fbq("track", eventName, parameters ?? {});
+  return true;
+}
+
 function getConsentSnapshot(): ConsentChoice | null {
   const storedChoice = window.localStorage.getItem(CONSENT_STORAGE_KEY);
   return storedChoice === "accepted" || storedChoice === "rejected"
@@ -97,7 +124,22 @@ export function MetaPixel() {
   useEffect(() => {
     if (consent !== "accepted") return;
     const fbq = initializeMetaPixel();
+    fbq("consent", "grant");
+    if (window.__cortaEssaMetaLastPageView === pathname) return;
+
     fbq("track", "PageView");
+    window.__cortaEssaMetaLastPageView = pathname;
+
+    if (pathname === "/clube") {
+      fbq("track", "ViewContent", {
+        content_name: "Clube Corta Essa",
+        content_category: "Clube de assinaturas",
+        content_ids: ["clube-corta-essa"],
+        content_type: "product_group",
+        currency: "BRL",
+        value: 79,
+      });
+    }
   }, [consent, pathname]);
 
   const saveChoice = (choice: ConsentChoice) => {
@@ -106,6 +148,8 @@ export function MetaPixel() {
     setSettingsRequested(false);
     if (choice === "rejected" && window.fbq) {
       window.fbq("consent", "revoke");
+    } else if (choice === "accepted" && window.fbq) {
+      window.fbq("consent", "grant");
     }
   };
 

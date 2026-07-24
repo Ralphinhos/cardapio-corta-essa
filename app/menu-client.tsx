@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
+import { trackMetaEvent } from "@/app/meta-pixel";
 import {
   type CatalogProduct,
   type CartItem,
@@ -114,7 +115,21 @@ function ProductCard({
                 <PackageX aria-hidden="true" /> Indisponível
               </span>
             ) : (
-              <a href={whatsappUrl(product)} target="_blank" rel="noreferrer">
+              <a
+                href={whatsappUrl(product)}
+                target="_blank"
+                rel="noreferrer"
+                onClick={() =>
+                  trackMetaEvent("Contact", {
+                    content_name: product.name,
+                    content_category: categoryLabel(category),
+                    content_ids: [productKey(category, product)],
+                    content_type: "product",
+                    currency: "BRL",
+                    value: product.price,
+                  })
+                }
+              >
                 Pedir este <span aria-hidden="true">↗</span>
               </a>
             )}
@@ -214,13 +229,27 @@ export function MenuClient({
   const addToCart = (product: Product, itemCategory: Category) => {
     if (product.stockQuantity != null && product.stockQuantity <= 0) return;
 
+    const key = productKey(itemCategory, product);
+    const quantityLimit = Math.min(product.stockQuantity ?? 20, 20);
+    const existing = cartItems.find(
+      (item) => productKey(item.category, item.product) === key,
+    );
+    if (existing && existing.quantity >= quantityLimit) return;
+
+    trackMetaEvent("AddToCart", {
+      content_name: product.name,
+      content_category: categoryLabel(itemCategory),
+      content_ids: [key],
+      content_type: "product",
+      currency: "BRL",
+      value: product.price,
+    });
+
     setCartItems((current) => {
-      const key = productKey(itemCategory, product);
-      const quantityLimit = Math.min(product.stockQuantity ?? 20, 20);
-      const existing = current.find(
+      const currentItem = current.find(
         (item) => productKey(item.category, item.product) === key,
       );
-      if (existing) {
+      if (currentItem) {
         return current.map((item) =>
           productKey(item.category, item.product) === key
             ? { ...item, quantity: Math.min(item.quantity + 1, quantityLimit) }
@@ -436,6 +465,16 @@ export function MenuClient({
                         href={whatsappUrl(product)}
                         target="_blank"
                         rel="noreferrer"
+                        onClick={() =>
+                          trackMetaEvent("Contact", {
+                            content_name: product.name,
+                            content_category: categoryLabel(category),
+                            content_ids: [productKey(category, product)],
+                            content_type: "product",
+                            currency: "BRL",
+                            value: product.price,
+                          })
+                        }
                       >
                         Pedir <span aria-hidden="true">↗</span>
                       </a>
@@ -574,7 +613,18 @@ export function MenuClient({
               <ShoppingBag aria-hidden="true" /> Revisar pedido
             </button>
           ) : (
-            <a className="order__button" href={whatsappUrl()} target="_blank" rel="noreferrer">
+            <a
+              className="order__button"
+              href={whatsappUrl()}
+              target="_blank"
+              rel="noreferrer"
+              onClick={() =>
+                trackMetaEvent("Contact", {
+                  content_name: "Encomenda pelo WhatsApp",
+                  content_category: "Cardápio",
+                })
+              }
+            >
               Pedir pelo WhatsApp <span aria-hidden="true">↗</span>
             </a>
           )}
