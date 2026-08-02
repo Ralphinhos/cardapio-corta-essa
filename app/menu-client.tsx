@@ -15,6 +15,7 @@ import {
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 import { trackMetaEvent } from "@/app/meta-pixel";
+import { VipWhatsAppButton } from "@/app/vip-whatsapp-button";
 import {
   type CatalogProduct,
   type CartItem,
@@ -693,6 +694,7 @@ export function MenuClient({
           onOrderPlaced={() => setCartItems([])}
         />
       )}
+      <VipWhatsAppButton />
     </main>
   );
 }

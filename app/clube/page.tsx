@@ -14,6 +14,7 @@ import {
   WalletCards,
 } from "lucide-react";
 import { MetaTrackedLink } from "@/app/meta-tracked-link";
+import { VipWhatsAppButton } from "@/app/vip-whatsapp-button";
 import { whatsappNumber } from "@/lib/catalog";
 import styles from "./clube.module.css";
 
@@ -510,6 +511,7 @@ export default function ClubPage() {
           <a href="#inicio">Voltar ao topo ↑</a>
         </div>
       </footer>
+      <VipWhatsAppButton />
     </main>
   );
 }
