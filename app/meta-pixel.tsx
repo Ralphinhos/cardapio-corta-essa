@@ -80,9 +80,7 @@ function initializeMetaPixel() {
 }
 
 function hasAdvertisingConsent() {
-  return (
-    window.localStorage.getItem(CONSENT_STORAGE_KEY) === "accepted"
-  );
+  return window.localStorage.getItem(CONSENT_STORAGE_KEY) === "accepted";
 }
 
 export function trackMetaEvent(

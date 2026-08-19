@@ -13,9 +13,9 @@ import {
   Truck,
   WalletCards,
 } from "lucide-react";
-import { whatsappNumber } from "@/lib/catalog";
 import { MetaTrackedLink } from "@/app/meta-tracked-link";
 import { VipWhatsAppButton } from "@/app/vip-whatsapp-button";
+import { whatsappNumber } from "@/lib/catalog";
 import styles from "./clube.module.css";
 
 export const metadata: Metadata = {
@@ -91,25 +91,19 @@ const clubWhatsAppUrl = (plan?: string) => {
   return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 };
 
-function ChampionMedal() {
-  return (
-    <span className={styles.championMedal} aria-label="Campeão de vendas">
-      <span className={styles.championMedalRibbons} aria-hidden="true" />
-      <span className={styles.championMedalRosette} aria-hidden="true">
-        <span className={styles.championMedalSeal}>
-          <Flame />
-          <strong>Campeão</strong>
-          <span>de vendas</span>
-        </span>
-      </span>
-    </span>
-  );
-}
-
 export default function ClubPage() {
   return (
     <main className={styles.page}>
       <section className={styles.hero} id="inicio">
+        <img
+          className={styles.heroGhostWord}
+          src="/images/mensal-type.webp"
+          width="1600"
+          height="800"
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+        />
         <header className={styles.header}>
           <Link className={styles.logo} href="/" aria-label="Voltar ao cardápio Corta Essa!">
             <img
@@ -131,7 +125,7 @@ export default function ClubPage() {
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>
               <span aria-hidden="true" />
-              Clube Corta Essa! · somente 40 vagas
+              Clube Corta Essa!
             </div>
             <h1>
               <span>Sua brasa.</span>
@@ -267,13 +261,22 @@ export default function ClubPage() {
             >
               <div className={styles.planTopline}>
                 <span>{plan.level}</span>
-                {plan.featured ? (
-                  <ChampionMedal />
-                ) : (
-                  <span>Clube</span>
-                )}
+                {!plan.featured && <span>Clube</span>}
               </div>
-              <div className={styles.planTitle}>
+              {plan.featured && (
+                <img
+                  className={styles.featuredMedal}
+                  src="/images/club-champion-medal.webp"
+                  width="512"
+                  height="512"
+                  loading="lazy"
+                  decoding="async"
+                  alt="Campeão de vendas"
+                />
+              )}
+              <div
+                className={`${styles.planTitle}${plan.featured ? ` ${styles.planTitleFeatured}` : ""}`}
+              >
                 <h3>{plan.name}</h3>
                 <p>{plan.profile}</p>
               </div>
@@ -301,9 +304,7 @@ export default function ClubPage() {
                 metaParameters={{
                   content_name: plan.name,
                   content_category: "Clube de assinaturas",
-                  content_ids: [
-                    plan.name.toLowerCase().replaceAll(" ", "-"),
-                  ],
+                  content_ids: [plan.name.toLowerCase().replaceAll(" ", "-")],
                   content_type: "product",
                   currency: "BRL",
                   num_items: 1,

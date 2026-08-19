@@ -36,6 +36,9 @@ test("renders the optimized catalog shell", async () => {
   assert.doesNotMatch(html, /src="\/images\/gourmet-type\.png"/);
   assert.match(html, /src="\/images\/logo-transparent\.webp"/);
   assert.match(html, /Grupo VIP/);
+  assert.match(html, /class="topbar__club-link"/);
+  assert.doesNotMatch(html, /topbar__club-tag/);
+  assert.doesNotMatch(html, /top-seller-medal/);
   assert.match(html, /id="tab-combo"/);
   assert.equal(
     (html.match(/class="product-card product-card--/g) ?? []).length,
@@ -72,6 +75,9 @@ test("renders the subscription club page", async () => {
   assert.match(html, /Anfitrião Premium/);
   assert.match(html, /Seleção do Mestre/);
   assert.match(html, /somente 40 vagas/);
+  assert.match(html, /src="\/images\/mensal-type\.webp"/);
+  assert.match(html, /src="\/images\/club-champion-medal\.webp"/);
+  assert.match(html, /alt="Campeão de vendas"/);
 });
 
 test("renders the Linha Rotina page and its premium value ladder", async () => {
