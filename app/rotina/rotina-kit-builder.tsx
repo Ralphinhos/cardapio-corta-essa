@@ -79,11 +79,10 @@ const isFlavorQuantities = (
 ): value is FlavorQuantities => {
   if (!value || typeof value !== "object") return false;
   const quantities = value as Partial<FlavorQuantities>;
-  const values = flavorOptions.map(({ key }) => quantities[key]);
+  const values = flavorOptions.map(({ key }) => Number(quantities[key]));
   return (
-    values.every(
-      (quantity) => Number.isInteger(quantity) && Number(quantity) >= 0,
-    ) && values.reduce((total, quantity) => total + Number(quantity), 0) === expectedTotal
+    values.every((quantity) => Number.isInteger(quantity) && quantity >= 0) &&
+    values.reduce((total, quantity) => total + quantity, 0) === expectedTotal
   );
 };
 
