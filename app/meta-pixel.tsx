@@ -80,7 +80,9 @@ function initializeMetaPixel() {
 }
 
 function hasAdvertisingConsent() {
-  return window.localStorage.getItem(CONSENT_STORAGE_KEY) === "accepted";
+  return (
+    window.localStorage.getItem(CONSENT_STORAGE_KEY) === "accepted"
+  );
 }
 
 export function trackMetaEvent(
@@ -138,6 +140,15 @@ export function MetaPixel() {
         content_type: "product_group",
         currency: "BRL",
         value: 79,
+      });
+    } else if (pathname === "/rotina") {
+      fbq("track", "ViewContent", {
+        content_name: "Linha Rotina",
+        content_category: "Marmitas vegetarianas artesanais",
+        content_ids: ["linha-rotina"],
+        content_type: "product_group",
+        currency: "BRL",
+        value: 29.9,
       });
     }
   }, [consent, pathname]);
