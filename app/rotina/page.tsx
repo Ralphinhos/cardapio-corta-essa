@@ -25,7 +25,7 @@ import styles from "./rotina.module.css";
 export const metadata: Metadata = {
   title: "Linha Rotina | Corta Essa!",
   description:
-    "Marmitas vegetarianas artesanais de 380 g para uma rotina prática, saborosa e sem cara de dieta. Monte kits de 1, 5 ou 20 em Poços de Caldas.",
+    "Marmitas vegetarianas gourmet congeladas de 380 g para uma rotina prática, saudável e cheia de sabor. Monte kits de 1, 5 ou 20 em Poços de Caldas.",
 };
 
 const flavors = [
@@ -100,12 +100,12 @@ export default function RotinaPage() {
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>
               <span aria-hidden="true" />
-              Linha Rotina · alta gastronomia para dias reais
+              MARMITAS GOURMET CONGELADAS - LINHA ROTINA
             </div>
             <h1>
               <span>Comida de</span>
               <span>verdade.</span>
-              <span>Rotina resolvida.</span>
+              <span>Para dias corridos.</span>
             </h1>
             <p>
               Refeições vegetarianas de 380 g, feitas artesanalmente para quem
@@ -134,8 +134,8 @@ export default function RotinaPage() {
             <div className={styles.heroFrame}>
               <img
                 src="/images/rotina/hero-person.webp"
-                width="759"
-                height="1349"
+                width="857"
+                height="1536"
                 alt=""
                 fetchPriority="high"
               />
@@ -169,7 +169,7 @@ export default function RotinaPage() {
           <span>01</span> / Uma nova rotina
         </div>
         <div className={styles.introCopy}>
-          <p className={styles.kicker}>Saudável sem virar dieta</p>
+          <p className={styles.kicker}>PRÁTICA E SAUDÁVEL</p>
           <h2 id="rotina-intro-title">
             Seu dia pode ser corrido. Sua comida não precisa ter pressa.
           </h2>
@@ -196,7 +196,7 @@ export default function RotinaPage() {
             <span>02</span> / Os pratos
           </div>
           <div>
-            <p className={styles.kicker}>Três receitas. Nenhuma sem graça.</p>
+            <p className={styles.kicker}>RECEITAS SABOROSAS E ESPECIAIS</p>
             <h2 id="flavors-title">Escolha seus sabores favoritos.</h2>
           </div>
           <p>
@@ -406,17 +406,10 @@ export default function RotinaPage() {
           <details>
             <summary>Como funciona a entrega?</summary>
             <p>
-              O atendimento é somente por entrega, em rotas programadas aos
-              domingos em Poços de Caldas. Taxa, disponibilidade e horário são
-              confirmados individualmente pelo WhatsApp.
-            </p>
-          </details>
-          <details>
-            <summary>“Saudável” significa comida de dieta?</summary>
-            <p>
-              Não. Para a Corta Essa, alimentação saudável reúne sabor, variedade,
-              nutrição consciente, satisfação e prazer à mesa — sem culpa ou
-              promessa de dieta.
+              As rotas dos kits são programadas para todos os domingos em Poços
+              de Caldas. Para entregas individuais, consulte taxa,
+              disponibilidade e horário diretamente pelo WhatsApp. Frete grátis
+              para pedidos acima de R$ 200.
             </p>
           </details>
         </div>
