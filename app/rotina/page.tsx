@@ -8,6 +8,7 @@ import {
   ChefHat,
   ChevronRight,
   Clock3,
+  Flame,
   HeartHandshake,
   Leaf,
   MessageCircle,
@@ -91,6 +92,7 @@ export default function RotinaPage() {
             <a href="#sabores">Sabores</a>
             <a href="#kits">Kits</a>
             <Link className={styles.headerCta} href="/clube">
+              <Flame aria-hidden="true" />
               Clube
             </Link>
           </nav>

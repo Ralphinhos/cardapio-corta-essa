@@ -102,6 +102,10 @@
 }
 
 .headerCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-width: 106px;
   padding: 12px 20px 9px;
   border: 1.5px solid var(--orange);
@@ -110,6 +114,14 @@
   color: var(--paper);
   text-align: center;
   transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.headerCta svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 auto;
+  fill: currentcolor;
+  stroke-width: 1.8;
 }
 
 .headerCta:hover {
@@ -1850,8 +1862,14 @@
 }
 
 @media (max-width: 450px) {
-  .header nav > a:first-child {
-    display: none;
+  .header nav {
+    gap: 10px;
+  }
+
+  .headerCta {
+    min-width: auto;
+    gap: 6px;
+    padding-inline: 10px;
   }
 
   .hero h1 {
