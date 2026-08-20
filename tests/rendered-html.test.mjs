@@ -114,5 +114,7 @@ test("renders the Linha Rotina page and its premium value ladder", async () => {
   assert.match(html, /RECEITAS SABOROSAS E ESPECIAIS/);
   assert.match(html, /Frete grátis/);
   assert.doesNotMatch(html, /significa comida de dieta/);
+  assert.match(html, /href="\/#cardapio">Brasa<\/a>/);
+  assert.match(html, /lucide-flame/);
   assert.match(html, /src="\/images\/rotina\/hero-person\.webp"/);
 });
