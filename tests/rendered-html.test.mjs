@@ -85,6 +85,9 @@ test("renders the subscription club page", async () => {
   assert.doesNotMatch(html, /Anfitrião Premium/);
   assert.match(html, /Seleção do Mestre/);
   assert.match(html, /somente 40 vagas/);
+  assert.match(html, /src="\/images\/mensal-type\.webp"/);
+  assert.match(html, /src="\/images\/club-champion-medal\.webp"/);
+  assert.match(html, /alt="Plano mais completo"/);
   assert.match(html, /src="\/images\/rotina\/parmegiana-transparent\.webp"/);
   assert.doesNotMatch(html, /src="\/images\/rotina\/parmegiana\.webp"/);
   assert.match(html, /todos os domingos em Poços/);
