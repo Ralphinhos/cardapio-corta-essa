@@ -659,10 +659,10 @@
 .featuredMedal {
   position: absolute;
   z-index: 5;
-  top: 10px;
-  right: 13px;
-  width: 118px;
-  height: 138px;
+  top: 78px;
+  right: 18px;
+  width: 108px;
+  height: 126px;
   object-fit: contain;
   filter: drop-shadow(0 8px 6px rgba(11, 33, 26, 0.24));
   pointer-events: none;
@@ -694,7 +694,9 @@
 }
 
 .planTitleFeatured {
+  min-height: 190px;
   padding-top: 28px;
+  padding-right: 142px;
 }
 
 .planTitle h3 {
@@ -762,6 +764,46 @@
 .planPrice div span {
   font-size: 0.82rem;
   font-weight: 700;
+}
+
+.planPrice > .planSaving {
+  display: grid;
+  align-items: start;
+  gap: 3px;
+  margin-top: 17px;
+  padding: 13px 14px 11px;
+  border: 1px solid rgba(127, 196, 41, 0.42);
+  border-radius: 7px;
+  background: rgba(127, 196, 41, 0.12);
+}
+
+.planSaving b {
+  color: var(--green);
+  font-family: var(--display-accent);
+  font-size: 1.45rem;
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.planSaving span,
+.planPrice .planSaving small {
+  color: rgba(247, 244, 236, 0.68);
+  font-size: 0.67rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.planCardFeatured .planSaving {
+  border-color: rgba(239, 73, 31, 0.42);
+  background: var(--orange);
+}
+
+.planCardFeatured .planSaving b,
+.planCardFeatured .planSaving span,
+.planCardFeatured .planSaving small {
+  color: var(--green-deeper);
 }
 
 .planCard ul {
@@ -1726,13 +1768,16 @@
   }
 
   .featuredMedal {
-    right: 8px;
-    width: 106px;
-    height: 124px;
+    top: 78px;
+    right: 10px;
+    width: 92px;
+    height: 108px;
   }
 
   .planTitleFeatured {
+    min-height: 178px;
     padding-top: 28px;
+    padding-right: 118px;
   }
 
   .choiceProduct {
