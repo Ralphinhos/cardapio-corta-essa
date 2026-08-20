@@ -108,6 +108,11 @@ test("renders the Linha Rotina page and its premium value ladder", async () => {
   assert.match(html, /Kit 5/);
   assert.match(html, /Kit 20/);
   assert.match(html, /sem renovação automática/i);
-  assert.match(html, /Saudável sem virar dieta/);
+  assert.match(html, /MARMITAS GOURMET CONGELADAS - LINHA ROTINA/);
+  assert.match(html, /Para dias corridos/);
+  assert.match(html, /PRÁTICA E SAUDÁVEL/);
+  assert.match(html, /RECEITAS SABOROSAS E ESPECIAIS/);
+  assert.match(html, /Frete grátis/);
+  assert.doesNotMatch(html, /significa comida de dieta/);
   assert.match(html, /src="\/images\/rotina\/hero-person\.webp"/);
 });
