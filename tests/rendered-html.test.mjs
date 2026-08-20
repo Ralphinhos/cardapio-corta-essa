@@ -76,7 +76,10 @@ test("renders the subscription club page", async () => {
   assert.match(html, /R\$\s*179/);
   assert.match(html, /R\$\s*529/);
   assert.match(html, /R\$\s*679/);
-  assert.match(html, /R\$\s*29 abaixo da soma dos individuais/);
+  assert.match(html, /Economize[\s\S]{0,40}R\$\s*7/);
+  assert.match(html, /Economize[\s\S]{0,40}R\$\s*69/);
+  assert.match(html, /Economize[\s\S]{0,40}R\$\s*105/);
+  assert.match(html, /R\$\s*29 abaixo das duas assinaturas separadas/);
   assert.doesNotMatch(html, /Clube Entusiasta/);
   assert.doesNotMatch(html, /Mestre Churrasqueiro/);
   assert.doesNotMatch(html, /Anfitrião Premium/);
@@ -85,6 +88,10 @@ test("renders the subscription club page", async () => {
   assert.match(html, /src="\/images\/mensal-type\.webp"/);
   assert.match(html, /src="\/images\/club-champion-medal\.webp"/);
   assert.match(html, /alt="Plano mais completo"/);
+  assert.match(html, /src="\/images\/rotina\/parmegiana-transparent\.webp"/);
+  assert.doesNotMatch(html, /src="\/images\/rotina\/parmegiana\.webp"/);
+  assert.match(html, /todos os domingos em Poços/);
+  assert.match(html, /Frete grátis/);
 });
 
 test("renders the Linha Rotina page and its premium value ladder", async () => {

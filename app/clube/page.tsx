@@ -32,6 +32,9 @@ type Plan = {
   profile: string;
   price: number;
   summary: string;
+  saving: number;
+  comparison: string;
+  extraSaving?: string;
   featured?: boolean;
   benefits: string[];
 };
@@ -45,6 +48,8 @@ const plans: Plan[] = [
     profile: "A experiência da grelha reservada para o seu mês.",
     price: 179,
     summary: "4 kits Brasa + Divine Flour",
+    saving: 7,
+    comparison: "Valor avulso de referência: R$ 186",
     benefits: [
       "4 kits Brasa à escolha por mês",
       "1 Divine Flour de 150 g",
@@ -60,6 +65,8 @@ const plans: Plan[] = [
     profile: "Comida de verdade pronta para acompanhar os dias corridos.",
     price: 529,
     summary: "20 marmitas por ciclo",
+    saving: 69,
+    comparison: "20 refeições avulsas: R$ 598",
     benefits: [
       "20 marmitas gourmet congeladas",
       "Combinação livre entre os três sabores",
@@ -74,7 +81,10 @@ const plans: Plan[] = [
     badge: "Completa",
     profile: "Brasa e Rotina juntas para viver a Corta Essa por inteiro.",
     price: 679,
-    summary: "R$ 29 abaixo da soma dos individuais",
+    summary: "Brasa + 20 marmitas por ciclo",
+    saving: 105,
+    comparison: "Compra avulsa equivalente: R$ 784",
+    extraSaving: "Também R$ 29 abaixo das duas assinaturas separadas",
     featured: true,
     benefits: [
       "4 kits Brasa à escolha por mês",
@@ -194,9 +204,9 @@ export default function ClubPage() {
             </div>
             <div className={`${styles.productFrame} ${styles.productFrameRight}`}>
               <img
-                src="/images/rotina/parmegiana.webp"
-                width="768"
-                height="1376"
+                src="/images/rotina/parmegiana-transparent.webp"
+                width="937"
+                height="1678"
                 alt=""
                 decoding="async"
               />
@@ -297,6 +307,11 @@ export default function ClubPage() {
                 <div>
                   <strong>{money(plan.price)}</strong>
                   <span>/ mês</span>
+                </div>
+                <div className={styles.planSaving}>
+                  <b>Economize {money(plan.saving)}</b>
+                  <span>{plan.comparison}</span>
+                  {plan.extraSaving && <small>{plan.extraSaving}</small>}
                 </div>
               </div>
               <ul>
@@ -403,7 +418,13 @@ export default function ClubPage() {
             <img src="/images/persian-kit.webp" width="535" height="660" alt="" loading="lazy" />
           </div>
           <div className={`${styles.choiceProduct} ${styles.choiceProductTwo}`}>
-            <img src="/images/rotina/parmegiana.webp" width="768" height="1376" alt="" loading="lazy" />
+            <img
+              src="/images/rotina/parmegiana-transparent.webp"
+              width="937"
+              height="1678"
+              alt=""
+              loading="lazy"
+            />
           </div>
         </div>
         <div className={styles.choiceCopy}>
@@ -449,12 +470,12 @@ export default function ClubPage() {
             </p>
           </details>
           <details>
-            <summary>Como funcionam as entregas?</summary>
+            <summary>Como funciona a entrega?</summary>
             <p>
-              O atendimento é somente por entrega em Poços de Caldas, com datas
-              agrupadas em rotas programadas. No 360°, Brasa e Marmitas são
-              organizadas no mesmo ciclo. Taxa e horário são confirmados no
-              atendimento.
+              As rotas dos kits são programadas para todos os domingos em Poços
+              de Caldas. Para entregas individuais, consulte taxa,
+              disponibilidade e horário diretamente pelo WhatsApp. Frete grátis
+              para pedidos acima de R$ 200.
             </p>
           </details>
           <details>
