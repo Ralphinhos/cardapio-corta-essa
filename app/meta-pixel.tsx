@@ -134,10 +134,14 @@ export function MetaPixel() {
       fbq("track", "ViewContent", {
         content_name: "Clube Corta Essa",
         content_category: "Clube de assinaturas",
-        content_ids: ["clube-corta-essa"],
+        content_ids: [
+          "assinatura-brasa",
+          "assinatura-marmitas",
+          "assinatura-360",
+        ],
         content_type: "product_group",
         currency: "BRL",
-        value: 79,
+        value: 179,
       });
     } else if (pathname === "/rotina") {
       fbq("track", "ViewContent", {

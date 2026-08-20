@@ -226,7 +226,7 @@
   padding: 17px 19px 14px;
   border-radius: 5px;
   background: var(--orange);
-  color: var(--paper);
+  color: var(--green-deeper);
   transition: background-color 180ms ease, transform 180ms ease;
 }
 

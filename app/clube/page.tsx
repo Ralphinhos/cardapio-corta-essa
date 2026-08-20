@@ -19,59 +19,69 @@ import { whatsappNumber } from "@/lib/catalog";
 import styles from "./clube.module.css";
 
 export const metadata: Metadata = {
-  title: "Clube Corta Essa! | Churrasco vegetariano todo mês",
+  title: "Clube Corta Essa! | Assinaturas Brasa, Marmitas e 360°",
   description:
-    "Escolha 2, 4 ou 8 kits por mês e tenha seu churrasco vegetariano reservado, com benefícios exclusivos e entrega em Poços de Caldas.",
+    "Escolha entre Assinatura Brasa, Assinatura Marmitas ou a experiência 360°, reunindo churrasco vegetariano e Linha Rotina em Poços de Caldas.",
 };
 
 type Plan = {
+  id: string;
   level: string;
   name: string;
+  badge: string;
   profile: string;
   price: number;
-  retailPrice: number;
+  summary: string;
   featured?: boolean;
   benefits: string[];
 };
 
 const plans: Plan[] = [
   {
-    level: "Nível 01",
-    name: "Clube Entusiasta",
-    profile: "Para quem acende a brasa duas vezes no mês.",
-    price: 79,
-    retailPrice: 84,
+    id: "assinatura-brasa",
+    level: "Plano 01",
+    name: "Assinatura Brasa",
+    badge: "Brasa",
+    profile: "A experiência da grelha reservada para o seu mês.",
+    price: 179,
+    summary: "4 kits Brasa + Divine Flour",
     benefits: [
-      "2 kits gourmet à escolha por mês",
-      "10% de desconto em pedidos extras",
+      "4 kits Brasa à escolha por mês",
+      "1 Divine Flour de 150 g",
       "Reserva mensal dos sabores escolhidos",
+      "Atendimento individual pelo WhatsApp",
     ],
   },
   {
-    level: "Nível 02",
-    name: "Mestre Churrasqueiro",
-    profile: "Um kit por semana para ter sempre à mão.",
-    price: 159,
-    retailPrice: 186,
+    id: "assinatura-marmitas",
+    level: "Plano 02",
+    name: "Assinatura Marmitas",
+    badge: "Rotina",
+    profile: "Comida de verdade pronta para acompanhar os dias corridos.",
+    price: 529,
+    summary: "20 marmitas por ciclo",
+    benefits: [
+      "20 marmitas gourmet congeladas",
+      "Combinação livre entre os três sabores",
+      "Prioridade na produção da Linha Rotina",
+      "Atendimento individual pelo WhatsApp",
+    ],
+  },
+  {
+    id: "assinatura-360",
+    level: "Plano 03",
+    name: "Assinatura 360°",
+    badge: "Completa",
+    profile: "Brasa e Rotina juntas para viver a Corta Essa por inteiro.",
+    price: 679,
+    summary: "R$ 29 abaixo da soma dos individuais",
     featured: true,
     benefits: [
-      "4 kits gourmet à escolha por mês",
+      "4 kits Brasa à escolha por mês",
       "1 Divine Flour de 150 g",
-      "Frete grátis em Poços de Caldas",
-      "Reserva prioritária de produtos",
-    ],
-  },
-  {
-    level: "Nível 03",
-    name: "Anfitrião Premium",
-    profile: "Para famílias, anfitriões e encontros maiores.",
-    price: 299,
-    retailPrice: 371,
-    benefits: [
-      "8 kits gourmet à escolha por mês",
-      "1 Kit Divine Flour completo (2 × 150 g)",
-      "Frete grátis em Poços de Caldas",
-      "Degustação VIP de lançamentos",
+      "20 marmitas com sabores combináveis",
+      "Uma única confirmação para as duas linhas",
+      "Prioridade máxima de produção e atendimento",
     ],
   },
 ];
@@ -125,15 +135,16 @@ export default function ClubPage() {
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>
               <span aria-hidden="true" />
-              Clube Corta Essa!
+              Clube Corta Essa! · somente 40 vagas
             </div>
             <h1>
-              <span>Sua brasa.</span>
+              <span>Brasa.</span>
+              <span>Rotina.</span>
               <span>Todo mês.</span>
             </h1>
             <p>
-              Escolha 2, 4 ou 8 kits e tenha seus sabores favoritos reservados
-              para receber em casa. Sem improviso. Sem churrasco sem graça.
+              Escolha uma linha ou viva a experiência completa: churrasco
+              vegetariano e marmitas gourmet reservados no mesmo ciclo.
             </p>
             <div className={styles.heroActions}>
               <a className={styles.primaryAction} href="#planos">
@@ -183,27 +194,27 @@ export default function ClubPage() {
             </div>
             <div className={`${styles.productFrame} ${styles.productFrameRight}`}>
               <img
-                src="/images/divine-kit.webp"
-                width="660"
-                height="660"
+                src="/images/rotina/parmegiana.webp"
+                width="768"
+                height="1376"
                 alt=""
                 decoding="async"
               />
             </div>
             <div className={styles.priceSeal}>
               <span>A partir de</span>
-              <strong>R$ 79</strong>
+              <strong>R$ 179</strong>
               <span>por mês</span>
             </div>
-            <span className={styles.visualCaption}>Escolha mensal</span>
+            <span className={styles.visualCaption}>Brasa + Rotina</span>
           </div>
         </div>
       </section>
 
       <section className={styles.promiseBar} aria-label="Benefícios principais">
         <div>
-          <strong>02 · 04 · 08</strong>
-          <span>Kits reservados por mês</span>
+          <strong>BRASA · ROTINA · 360°</strong>
+          <span>Três formas de pertencer</span>
         </div>
         <div>
           <PackageCheck aria-hidden="true" />
@@ -221,10 +232,11 @@ export default function ClubPage() {
         </div>
         <div className={styles.introCopy}>
           <p className={styles.kicker}>Não é uma caixa surpresa.</p>
-          <h2 id="club-intro-title">É o seu churrasco já garantido.</h2>
+          <h2 id="club-intro-title">É a Corta Essa presente nos seus dias.</h2>
           <p>
-            A cada ciclo, você escolhe os kits que quer receber. Confirmou a
-            seleção? A Corta Essa reserva, prepara e entrega na rota do mês.
+            A cada ciclo, você escolhe seus kits Brasa, suas marmitas ou os dois.
+            A Corta Essa reserva, prepara e organiza tudo em uma experiência
+            artesanal, próxima e previsível.
           </p>
         </div>
         <aside className={styles.masterSelection}>
@@ -244,12 +256,12 @@ export default function ClubPage() {
             <span>02</span> / Planos mensais
           </div>
           <div>
-            <p className={styles.kicker}>Escolha seu ritmo</p>
-            <h2 id="plans-title">Quanto de brasa cabe no seu mês?</h2>
+            <p className={styles.kicker}>Escolha sua experiência</p>
+            <h2 id="plans-title">Qual Corta Essa combina com o seu mês?</h2>
           </div>
           <p>
-            Todos os planos permitem escolher os sabores do ciclo e garantem a
-            reserva dos produtos antes da venda avulsa.
+            Assine Brasa ou Marmitas separadamente — ou reúna as duas linhas no
+            360°, com valor inferior à soma dos planos individuais.
           </p>
         </div>
 
@@ -261,7 +273,7 @@ export default function ClubPage() {
             >
               <div className={styles.planTopline}>
                 <span>{plan.level}</span>
-                {!plan.featured && <span>Clube</span>}
+                <span>{plan.badge}</span>
               </div>
               {plan.featured && (
                 <img
@@ -271,7 +283,7 @@ export default function ClubPage() {
                   height="512"
                   loading="lazy"
                   decoding="async"
-                  alt="Campeão de vendas"
+                  alt="Plano mais completo"
                 />
               )}
               <div
@@ -281,7 +293,7 @@ export default function ClubPage() {
                 <p>{plan.profile}</p>
               </div>
               <div className={styles.planPrice}>
-                <span>de {money(plan.retailPrice)} avulso por</span>
+                <span>{plan.summary}</span>
                 <div>
                   <strong>{money(plan.price)}</strong>
                   <span>/ mês</span>
@@ -304,7 +316,7 @@ export default function ClubPage() {
                 metaParameters={{
                   content_name: plan.name,
                   content_category: "Clube de assinaturas",
-                  content_ids: [plan.name.toLowerCase().replaceAll(" ", "-")],
+                  content_ids: [plan.id],
                   content_type: "product",
                   currency: "BRL",
                   num_items: 1,
@@ -323,8 +335,9 @@ export default function ClubPage() {
         </div>
 
         <p className={styles.planFootnote}>
-          Adesão sujeita à disponibilidade de vagas. Datas, taxa de entrega do
-          plano Entusiasta e forma de pagamento são confirmadas no atendimento.
+          Adesão formalizada por contrato e sujeita à disponibilidade de vagas.
+          Datas, taxa de entrega e forma de pagamento são confirmadas
+          individualmente pelo WhatsApp.
         </p>
       </section>
 
@@ -347,19 +360,19 @@ export default function ClubPage() {
           <li>
             <span>01</span>
             <WalletCards aria-hidden="true" />
-            <h3>Confirme seu plano</h3>
+            <h3>Escolha sua experiência</h3>
             <p>
-              Escolha o nível ideal e confirme a assinatura e o pagamento com a
-              equipe Corta Essa.
+              Selecione Brasa, Marmitas ou 360° e confirme o contrato e o
+              pagamento com a equipe Corta Essa.
             </p>
           </li>
           <li>
             <span>02</span>
             <PackageCheck aria-hidden="true" />
-            <h3>Escolha seus kits</h3>
+            <h3>Defina suas escolhas</h3>
             <p>
-              Com o ciclo liberado, envie os sabores do mês dentro da quantidade
-              do seu plano.
+              Envie os sabores dos kits Brasa e a combinação de marmitas prevista
+              no seu plano.
             </p>
           </li>
           <li>
@@ -376,8 +389,8 @@ export default function ClubPage() {
             <Truck aria-hidden="true" />
             <h3>Receba em casa</h3>
             <p>
-              Seus kits chegam prontos para armazenar, preparar e transformar o
-              próximo encontro.
+              Os produtos do ciclo chegam organizados para a sua rotina e para os
+              próximos momentos de grelha.
             </p>
           </li>
         </ol>
@@ -390,22 +403,22 @@ export default function ClubPage() {
             <img src="/images/persian-kit.webp" width="535" height="660" alt="" loading="lazy" />
           </div>
           <div className={`${styles.choiceProduct} ${styles.choiceProductTwo}`}>
-            <img src="/images/tropical-kit.webp" width="567" height="660" alt="" loading="lazy" />
+            <img src="/images/rotina/parmegiana.webp" width="768" height="1376" alt="" loading="lazy" />
           </div>
         </div>
         <div className={styles.choiceCopy}>
           <div className={`${styles.sectionMarker} ${styles.sectionMarkerLight}`}>
             <span>04</span> / Liberdade de escolha
           </div>
-          <p className={styles.kicker}>Seu plano, seus sabores</p>
-          <h2 id="choice-title">Você escolhe o que vai para a grelha.</h2>
+          <p className={styles.kicker}>Seu plano, suas escolhas</p>
+          <h2 id="choice-title">Da grelha aos dias corridos.</h2>
           <p>
-            Creamy Orange, Petite Zucchini, Persian Barbecue, Turkish Skewer e
-            outros kits ativos no ciclo entram na seleção. A disponibilidade do
-            assinante é reservada antes da venda avulsa.
+            Escolha os sabores Brasa e combine livremente as receitas da Linha
+            Rotina. No 360°, as duas experiências são confirmadas juntas e
+            reservadas antes da venda avulsa.
           </p>
-          <Link href="/#cardapio">
-            Explorar sabores do cardápio <span aria-hidden="true">↗</span>
+          <Link href="/rotina">
+            Conhecer também a Linha Rotina <span aria-hidden="true">↗</span>
           </Link>
         </div>
       </section>
@@ -424,23 +437,32 @@ export default function ClubPage() {
           <details>
             <summary>Posso escolher os sabores todos os meses?</summary>
             <p>
-              Sim. Você escolhe a quantidade de kits prevista no seu plano entre
-              os produtos disponíveis naquele ciclo.
+              Sim. Na Brasa, você escolhe os kits disponíveis no ciclo. Nas
+              Marmitas, combina livremente os três sabores da Linha Rotina.
             </p>
           </details>
           <details>
             <summary>O que acontece se eu não enviar minha escolha?</summary>
             <p>
               A Seleção do Mestre entra em ação: montamos um mix variado dentro
-              da quantidade do seu plano para você não perder o ciclo.
+              da composição do seu plano para você não perder o ciclo.
             </p>
           </details>
           <details>
             <summary>Como funcionam as entregas?</summary>
             <p>
               O atendimento é somente por entrega em Poços de Caldas, com datas
-              agrupadas em rotas fixas. Os planos Mestre e Anfitrião têm frete
-              grátis; no Entusiasta, a taxa é confirmada no atendimento.
+              agrupadas em rotas programadas. No 360°, Brasa e Marmitas são
+              organizadas no mesmo ciclo. Taxa e horário são confirmados no
+              atendimento.
+            </p>
+          </details>
+          <details>
+            <summary>A assinatura possui permanência mínima?</summary>
+            <p>
+              Sim. A adesão é formalizada por contrato, com permanência mínima de
+              três ciclos mensais. As condições completas são apresentadas antes
+              da confirmação.
             </p>
           </details>
           <details>
@@ -457,10 +479,10 @@ export default function ClubPage() {
         <div className={styles.finalCtaGhost} aria-hidden="true">CLUBE</div>
         <div>
           <span>Primeira turma · 40 assinantes</span>
-          <h2 id="final-cta-title">A próxima brasa já pode estar garantida.</h2>
+          <h2 id="final-cta-title">Brasa e rotina podem caminhar juntas.</h2>
           <p>
-            Entre para o Clube Corta Essa e tenha sabor, variedade e prioridade
-            todos os meses.
+            Escolha uma linha ou entre no 360° para viver a experiência completa
+            da Corta Essa todos os meses.
           </p>
         </div>
         <MetaTrackedLink
@@ -487,7 +509,7 @@ export default function ClubPage() {
               loading="lazy"
               alt="Corta Essa!"
             />
-            <strong>Churrasco vegetariano de verdade. Todo mês.</strong>
+            <strong>Da brasa à rotina. Comida de verdade, todo mês.</strong>
           </div>
           <nav aria-label="Navegação do rodapé">
             <span>Navegue</span>

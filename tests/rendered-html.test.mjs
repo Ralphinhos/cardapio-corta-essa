@@ -70,14 +70,21 @@ test("renders the subscription club page", async () => {
 
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /Clube Entusiasta/);
-  assert.match(html, /Mestre Churrasqueiro/);
-  assert.match(html, /Anfitrião Premium/);
+  assert.match(html, /Assinatura Brasa/);
+  assert.match(html, /Assinatura Marmitas/);
+  assert.match(html, /Assinatura 360°/);
+  assert.match(html, /R\$\s*179/);
+  assert.match(html, /R\$\s*529/);
+  assert.match(html, /R\$\s*679/);
+  assert.match(html, /R\$\s*29 abaixo da soma dos individuais/);
+  assert.doesNotMatch(html, /Clube Entusiasta/);
+  assert.doesNotMatch(html, /Mestre Churrasqueiro/);
+  assert.doesNotMatch(html, /Anfitrião Premium/);
   assert.match(html, /Seleção do Mestre/);
   assert.match(html, /somente 40 vagas/);
   assert.match(html, /src="\/images\/mensal-type\.webp"/);
   assert.match(html, /src="\/images\/club-champion-medal\.webp"/);
-  assert.match(html, /alt="Campeão de vendas"/);
+  assert.match(html, /alt="Plano mais completo"/);
 });
 
 test("renders the Linha Rotina page and its premium value ladder", async () => {
