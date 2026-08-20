@@ -378,7 +378,7 @@ export function MenuClient({
                 alt=""
               />
             </div>
-            <span className="hero-collage__note">100% vegetal</span>
+            <span className="hero-collage__note">Vegetariano artesanal</span>
           </div>
         </div>
       </section>
