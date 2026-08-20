@@ -1365,7 +1365,7 @@
 }
 
 @media (max-width: 900px) {
-  .header nav a:nth-child(2) {
+  .header nav a:nth-child(3) {
     display: none;
   }
 

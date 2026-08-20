@@ -292,6 +292,7 @@ export function MenuClient({
           </a>
           <nav aria-label="Navegação principal">
             <a href="#cardapio">Cardápio</a>
+            <a href="/rotina">Rotina</a>
             <a className="topbar__club-link" href="/clube">
               <Flame aria-hidden="true" />
               <span>Clube</span>
@@ -661,6 +662,7 @@ export function MenuClient({
           <nav className="footer__nav" aria-label="Navegação do rodapé">
             <span>Navegue</span>
             <a href="#cardapio">Cardápio</a>
+            <a href="/rotina">Linha Rotina</a>
             <a href="/clube">Clube de assinaturas</a>
             <a href="#encomendas">Encomendas</a>
           </nav>
