@@ -13,9 +13,9 @@ import {
   Truck,
   WalletCards,
 } from "lucide-react";
+import { whatsappNumber } from "@/lib/catalog";
 import { MetaTrackedLink } from "@/app/meta-tracked-link";
 import { VipWhatsAppButton } from "@/app/vip-whatsapp-button";
-import { whatsappNumber } from "@/lib/catalog";
 import styles from "./clube.module.css";
 
 export const metadata: Metadata = {
@@ -63,9 +63,9 @@ const plans: Plan[] = [
     name: "Assinatura Marmitas",
     badge: "Rotina",
     profile: "Comida de verdade pronta para acompanhar os dias corridos.",
-    price: 529,
+    price: 519,
     summary: "20 marmitas por ciclo",
-    saving: 69,
+    saving: 79,
     comparison: "20 refeições avulsas: R$ 598",
     benefits: [
       "20 marmitas gourmet congeladas",
@@ -80,9 +80,9 @@ const plans: Plan[] = [
     name: "Assinatura 360°",
     badge: "Completa",
     profile: "Brasa e Rotina juntas para viver a Corta Essa por inteiro.",
-    price: 679,
+    price: 669,
     summary: "Brasa + 20 marmitas por ciclo",
-    saving: 105,
+    saving: 115,
     comparison: "Compra avulsa equivalente: R$ 784",
     extraSaving: "Também R$ 29 abaixo das duas assinaturas separadas",
     featured: true,
@@ -111,19 +111,25 @@ const clubWhatsAppUrl = (plan?: string) => {
   return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 };
 
+function ChampionMedal() {
+  return (
+    <span className={styles.championMedal} aria-label="Assinatura 360°, plano mais completo">
+      <span className={styles.championMedalRibbons} aria-hidden="true" />
+      <span className={styles.championMedalRosette} aria-hidden="true">
+        <span className={styles.championMedalSeal}>
+          <Flame />
+          <strong>360°</strong>
+          <span>mais completo</span>
+        </span>
+      </span>
+    </span>
+  );
+}
+
 export default function ClubPage() {
   return (
     <main className={styles.page}>
       <section className={styles.hero} id="inicio">
-        <img
-          className={styles.heroGhostWord}
-          src="/images/mensal-type.webp"
-          width="1600"
-          height="800"
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-        />
         <header className={styles.header}>
           <Link className={styles.logo} href="/" aria-label="Voltar ao cardápio Corta Essa!">
             <img
@@ -283,22 +289,13 @@ export default function ClubPage() {
             >
               <div className={styles.planTopline}>
                 <span>{plan.level}</span>
-                <span>{plan.badge}</span>
+                {plan.featured ? (
+                  <ChampionMedal />
+                ) : (
+                  <span>{plan.badge}</span>
+                )}
               </div>
-              {plan.featured && (
-                <img
-                  className={styles.featuredMedal}
-                  src="/images/club-champion-medal.webp"
-                  width="512"
-                  height="512"
-                  loading="lazy"
-                  decoding="async"
-                  alt="Plano mais completo"
-                />
-              )}
-              <div
-                className={`${styles.planTitle}${plan.featured ? ` ${styles.planTitleFeatured}` : ""}`}
-              >
+              <div className={styles.planTitle}>
                 <h3>{plan.name}</h3>
                 <p>{plan.profile}</p>
               </div>
@@ -331,7 +328,9 @@ export default function ClubPage() {
                 metaParameters={{
                   content_name: plan.name,
                   content_category: "Clube de assinaturas",
-                  content_ids: [plan.id],
+                  content_ids: [
+                    plan.id,
+                  ],
                   content_type: "product",
                   currency: "BRL",
                   num_items: 1,
