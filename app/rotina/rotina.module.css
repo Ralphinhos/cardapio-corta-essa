@@ -120,6 +120,7 @@
   width: 17px;
   height: 17px;
   flex: 0 0 auto;
+  color: var(--deep);
   fill: currentcolor;
   stroke-width: 1.8;
 }
@@ -249,7 +250,7 @@
   min-width: 222px;
   padding: 16px 22px 13px;
   background: var(--orange);
-  color: white;
+  color: var(--deep);
   box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
 }
 

@@ -16,4 +16,8 @@ test("configures the Meta Pixel behind explicit consent", async () => {
   assert.match(source, /usePathname\(\)/);
   assert.match(source, /pathname === "\/rotina"/);
   assert.match(source, /content_name: "Linha Rotina"/);
+  assert.match(source, /"assinatura-brasa"/);
+  assert.match(source, /"assinatura-marmitas"/);
+  assert.match(source, /"assinatura-360"/);
+  assert.match(source, /value: 179/);
 });
