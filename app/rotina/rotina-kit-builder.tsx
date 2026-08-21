@@ -51,9 +51,9 @@ const packageOptions: PackageOption[] = [
     name: "Kit 20",
     description: "A solução mais completa para ter comida de verdade à mão.",
     quantity: 20,
-    price: 519,
-    unitPrice: 25.95,
-    saving: 79,
+    price: 529,
+    unitPrice: 26.45,
+    saving: 69,
     featured: true,
   },
 ];

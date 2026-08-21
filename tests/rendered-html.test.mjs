@@ -74,11 +74,11 @@ test("renders the subscription club page", async () => {
   assert.match(html, /Assinatura Marmitas/);
   assert.match(html, /Assinatura 360°/);
   assert.match(html, /R\$\s*179/);
-  assert.match(html, /R\$\s*529/);
-  assert.match(html, /R\$\s*679/);
+  assert.match(html, /R\$\s*519/);
+  assert.match(html, /R\$\s*669/);
   assert.match(html, /Economize[\s\S]{0,40}R\$\s*7/);
-  assert.match(html, /Economize[\s\S]{0,40}R\$\s*69/);
-  assert.match(html, /Economize[\s\S]{0,40}R\$\s*105/);
+  assert.match(html, /Economize[\s\S]{0,40}R\$\s*79/);
+  assert.match(html, /Economize[\s\S]{0,40}R\$\s*115/);
   assert.match(html, /R\$\s*29 abaixo das duas assinaturas separadas/);
   assert.doesNotMatch(html, /Clube Entusiasta/);
   assert.doesNotMatch(html, /Mestre Churrasqueiro/);
@@ -121,6 +121,8 @@ test("renders the Linha Rotina page and its premium value ladder", async () => {
   assert.match(html, /Parmegiana de Soja/);
   assert.match(html, /Kit 5/);
   assert.match(html, /Kit 20/);
+  assert.match(html, /R\$\s*529/);
+  assert.match(html, /Economize[\s\S]{0,40}R\$\s*69/);
   assert.match(html, /sem renovação automática/i);
   assert.match(html, /MARMITAS GOURMET CONGELADAS - LINHA ROTINA/);
   assert.match(html, /Para dias corridos/);
