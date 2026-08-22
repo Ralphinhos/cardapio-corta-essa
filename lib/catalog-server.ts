@@ -4,6 +4,7 @@ import {
   type Category,
   type ProductTone,
   fallbackCatalog,
+  fallbackRoutineCatalog,
 } from "@/lib/catalog";
 
 export type CatalogInventory = {
@@ -27,10 +28,14 @@ type CatalogRow = {
   display_order: unknown;
   stock_quantity: unknown;
   is_top_seller: unknown;
+  active?: unknown;
 };
 
 const isCategory = (value: unknown): value is Category =>
-  value === "kit" || value === "unit" || value === "combo";
+  value === "kit" ||
+  value === "unit" ||
+  value === "combo" ||
+  value === "rotina";
 
 const isTone = (value: unknown): value is ProductTone =>
   value === "green" || value === "orange";
@@ -47,7 +52,7 @@ const fallbackWithInventory = (inventory: CatalogInventory[]) => {
   });
 };
 
-export async function getCatalogProducts(): Promise<CatalogProduct[]> {
+const getCatalogConnection = () => {
   const supabaseUrl =
     process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey =
@@ -55,57 +60,70 @@ export async function getCatalogProducts(): Promise<CatalogProduct[]> {
     process.env.SUPABASE_SERVICE_ROLE_KEY ??
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-  if (!supabaseUrl || !supabaseKey) return fallbackCatalog;
+  if (!supabaseUrl || !supabaseKey) return null;
 
-  const supabase = createClient(supabaseUrl, supabaseKey, {
+  return createClient(supabaseUrl, supabaseKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
+};
+
+const mapCatalogRows = (rows: CatalogRow[]) =>
+  rows.flatMap((row): CatalogProduct[] => {
+    if (
+      typeof row.key !== "string" ||
+      typeof row.slug !== "string" ||
+      !isCategory(row.category) ||
+      typeof row.name !== "string" ||
+      typeof row.description !== "string" ||
+      typeof row.weight !== "string" ||
+      typeof row.image_path !== "string"
+    ) {
+      return [];
+    }
+
+    return [
+      {
+        key: row.key,
+        slug: row.slug,
+        category: row.category,
+        name: row.name,
+        description: row.description,
+        detail:
+          typeof row.detail === "string" && row.detail ? row.detail : undefined,
+        badgeText:
+          typeof row.badge_text === "string" && row.badge_text
+            ? row.badge_text
+            : row.category === "rotina"
+              ? "Vegetariano"
+              : "Feito para a brasa",
+        weight: row.weight,
+        price: Number(row.price_cents) / 100,
+        tone: isTone(row.tone) ? row.tone : "green",
+        imagePath: row.image_path,
+        displayOrder: Number(row.display_order) || 0,
+        stockQuantity: Number(row.stock_quantity),
+        isTopSeller: Boolean(row.is_top_seller),
+      },
+    ];
+  });
+
+export async function getCatalogProducts(): Promise<CatalogProduct[]> {
+  const supabase = getCatalogConnection();
+  if (!supabase) return fallbackCatalog;
+
   const { data, error } = await supabase
     .from("catalog_products")
     .select(
       "key, slug, category, name, description, detail, badge_text, weight, price_cents, tone, image_path, display_order, stock_quantity, is_top_seller",
     )
     .eq("active", true)
+    .not("key", "like", "rotina-%")
     .order("category")
     .order("display_order")
     .order("created_at");
 
   if (!error) {
-    return ((data ?? []) as CatalogRow[]).flatMap((row) => {
-      if (
-        typeof row.key !== "string" ||
-        typeof row.slug !== "string" ||
-        !isCategory(row.category) ||
-        typeof row.name !== "string" ||
-        typeof row.description !== "string" ||
-        typeof row.weight !== "string" ||
-        typeof row.image_path !== "string"
-      ) {
-        return [];
-      }
-
-      return [
-        {
-          key: row.key,
-          slug: row.slug,
-          category: row.category,
-          name: row.name,
-          description: row.description,
-          detail: typeof row.detail === "string" && row.detail ? row.detail : undefined,
-          badgeText:
-            typeof row.badge_text === "string" && row.badge_text
-              ? row.badge_text
-              : "Feito para a brasa",
-          weight: row.weight,
-          price: Number(row.price_cents) / 100,
-          tone: isTone(row.tone) ? row.tone : "green",
-          imagePath: row.image_path,
-          displayOrder: Number(row.display_order) || 0,
-          stockQuantity: Number(row.stock_quantity),
-          isTopSeller: Boolean(row.is_top_seller),
-        },
-      ];
-    });
+    return mapCatalogRows((data ?? []) as CatalogRow[]);
   }
 
   console.error(
@@ -126,5 +144,56 @@ export async function getCatalogProducts(): Promise<CatalogProduct[]> {
       stock_quantity: Number(product.stock_quantity),
       is_top_seller: Boolean(product.is_top_seller),
     })),
+  );
+}
+
+export async function getRoutineProducts(): Promise<CatalogProduct[]> {
+  const supabase = getCatalogConnection();
+  if (!supabase) return fallbackRoutineCatalog;
+
+  const { data, error } = await supabase
+    .from("catalog_products")
+    .select(
+      "key, slug, category, name, description, detail, badge_text, weight, price_cents, tone, image_path, display_order, stock_quantity, is_top_seller, active",
+    )
+    .like("key", "rotina-%")
+    .order("display_order")
+    .order("created_at");
+
+  if (error) {
+    console.error(
+      "[catalog] Linha Rotina dinâmica indisponível; usando dados locais:",
+      error.message,
+    );
+    return fallbackRoutineCatalog;
+  }
+
+  const rows = (data ?? []) as CatalogRow[];
+  if (rows.length === 0) return fallbackRoutineCatalog;
+
+  const activeDatabaseProducts = mapCatalogRows(
+    rows.filter((row) => row.active === true),
+  ).map((product) => ({ ...product, category: "rotina" as const }));
+  const databaseKeys = new Set(
+    rows.flatMap((row) => (typeof row.key === "string" ? [row.key] : [])),
+  );
+  const productsByKey = new Map(
+    activeDatabaseProducts.map((product) => [product.key, product]),
+  );
+  const fallbackKeys = new Set(
+    fallbackRoutineCatalog.map((product) => product.key),
+  );
+
+  return [
+    ...fallbackRoutineCatalog.flatMap((product) => {
+      if (!databaseKeys.has(product.key)) return [product];
+      const databaseProduct = productsByKey.get(product.key);
+      return databaseProduct ? [databaseProduct] : [];
+    }),
+    ...activeDatabaseProducts.filter((product) => !fallbackKeys.has(product.key)),
+  ].toSorted(
+    (first, second) =>
+      first.displayOrder - second.displayOrder ||
+      first.name.localeCompare(second.name),
   );
 }

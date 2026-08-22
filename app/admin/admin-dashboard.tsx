@@ -14,6 +14,7 @@ import {
   PackageX,
   Save,
   ShieldCheck,
+  Snowflake,
   Sparkles,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -24,12 +25,17 @@ import type { AdminProduct } from "@/app/admin/product-types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 import {
   catalogCategories,
+  brasaCategories,
   categoryLabel,
+  fallbackRoutineCatalog,
   formatPrice,
   productImageUrl,
 } from "@/lib/catalog";
 
 type Feedback = { kind: "success" | "error"; message: string } | null;
+type AdminLine = "brasa" | "rotina";
+const isRoutineProduct = (product: AdminProduct) =>
+  product.key.startsWith("rotina-");
 
 export function AdminDashboard({
   email,
@@ -46,30 +52,43 @@ export function AdminDashboard({
   const [loggingOut, setLoggingOut] = useState(false);
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
+  const [activeLine, setActiveLine] = useState<AdminLine>("brasa");
+
+  const lineProducts = useMemo(
+    () =>
+      products.filter((product) =>
+        activeLine === "rotina"
+          ? isRoutineProduct(product)
+          : !isRoutineProduct(product),
+      ),
+    [activeLine, products],
+  );
 
   const summary = useMemo(
     () => ({
-      total: products.filter((product) => product.active).length,
-      available: products.filter(
-        (product) => product.active && product.stock_quantity > 0,
+      total: lineProducts.filter((product) => product.active).length,
+      available: lineProducts.filter(
+        (product) =>
+          product.active &&
+          (product.persisted === false || product.stock_quantity > 0),
       ).length,
-      highlighted: products.filter(
+      highlighted: lineProducts.filter(
         (product) => product.active && product.is_top_seller,
       ).length,
     }),
-    [products],
+    [lineProducts],
   );
 
   const sortedProducts = useMemo(
     () =>
-      [...products].sort(
+      [...lineProducts].sort(
         (first, second) =>
           catalogCategories.indexOf(first.category) -
             catalogCategories.indexOf(second.category) ||
           first.display_order - second.display_order ||
           first.name.localeCompare(second.name),
       ),
-    [products],
+    [lineProducts],
   );
 
   const nextOrders = useMemo(
@@ -93,6 +112,14 @@ export function AdminDashboard({
           0,
           ...products
             .filter((product) => product.category === "combo")
+            .map((product) => product.display_order),
+        ) + 1,
+      rotina:
+        Math.max(
+          0,
+          ...fallbackRoutineCatalog.map((product) => product.displayOrder),
+          ...products
+            .filter(isRoutineProduct)
             .map((product) => product.display_order),
         ) + 1,
     }),
@@ -178,14 +205,22 @@ export function AdminDashboard({
     setEditingProduct(null);
   }
 
+  function selectLine(line: AdminLine) {
+    setActiveLine(line);
+    setEditorOpen(false);
+    setEditingProduct(null);
+    setFeedback(null);
+  }
+
   function productSaved(savedProduct: AdminProduct, created: boolean) {
-    setProducts((current) =>
-      created
-        ? [...current, savedProduct]
-        : current.map((product) =>
-            product.key === savedProduct.key ? savedProduct : product,
-          ),
-    );
+    setProducts((current) => {
+      const persistedProduct = { ...savedProduct, persisted: true };
+      return current.some((product) => product.key === savedProduct.key)
+        ? current.map((product) =>
+            product.key === savedProduct.key ? persistedProduct : product,
+          )
+        : [...current, persistedProduct];
+    });
     setDirtyKeys((current) => {
       const next = new Set(current);
       next.delete(savedProduct.key);
@@ -228,8 +263,8 @@ export function AdminDashboard({
       <section className="admin-hero">
         <div>
           <p><ShieldCheck aria-hidden="true" /> Acesso protegido</p>
-          <h1>Gestão do cardápio</h1>
-          <span>Cadastre produtos e controle preço, imagem, estoque e destaques.</span>
+          <h1>Gestão dos produtos</h1>
+          <span>Administre separadamente as linhas Brasa e Rotina.</span>
         </div>
         <div className="admin-summary" aria-label="Resumo do catálogo">
           <article><strong>{summary.total}</strong><span>Produtos ativos</span></article>
@@ -245,34 +280,77 @@ export function AdminDashboard({
         </div>
       )}
 
+      <nav className="admin-catalog-tabs" aria-label="Linha de produtos" role="tablist">
+        <button
+          id="admin-tab-brasa"
+          type="button"
+          role="tab"
+          aria-selected={activeLine === "brasa"}
+          aria-controls="admin-products-panel"
+          className={activeLine === "brasa" ? "admin-catalog-tabs__active" : ""}
+          onClick={() => selectLine("brasa")}
+        >
+          <Flame aria-hidden="true" />
+          <span><strong>Linha Brasa</strong><small>{products.filter((product) => !isRoutineProduct(product)).length} produtos</small></span>
+        </button>
+        <button
+          id="admin-tab-rotina"
+          type="button"
+          role="tab"
+          aria-selected={activeLine === "rotina"}
+          aria-controls="admin-products-panel"
+          className={activeLine === "rotina" ? "admin-catalog-tabs__active" : ""}
+          onClick={() => selectLine("rotina")}
+        >
+          <Snowflake aria-hidden="true" />
+          <span><strong>Linha Rotina</strong><small>{products.filter(isRoutineProduct).length} marmitas</small></span>
+        </button>
+      </nav>
+
       {editorOpen && (
         <AdminProductForm
           key={editingProduct?.key ?? "new-product"}
           product={editingProduct}
           nextOrders={nextOrders}
           existingKeys={products.map((product) => product.key)}
+          initialCategory={activeLine === "rotina" ? "rotina" : "kit"}
+          allowedCategories={
+            activeLine === "rotina" ? (["rotina"] as const) : brasaCategories
+          }
           onSaved={productSaved}
           onCancel={closeEditor}
         />
       )}
 
-      <section className="admin-products" aria-labelledby="admin-products-title">
+      <section
+        className="admin-products"
+        id="admin-products-panel"
+        role="tabpanel"
+        aria-labelledby={`admin-tab-${activeLine}`}
+      >
         <div className="admin-section-title">
-          <span>01 / Catálogo</span>
+          <span>01 / {activeLine === "rotina" ? "Linha Rotina" : "Linha Brasa"}</span>
           <div>
-            <h2 id="admin-products-title">Catálogo atual</h2>
-            <p>Estoque zero bloqueia a compra; produto inativo some do cardápio.</p>
+            <h2>
+              {activeLine === "rotina" ? "Marmitas cadastradas" : "Catálogo da Brasa"}
+            </h2>
+            <p>
+              {activeLine === "rotina"
+                ? "Cada marmita ativa aparece automaticamente nos sabores e no montador de kits."
+                : "Estoque zero bloqueia a compra; produto inativo some do cardápio."}
+            </p>
           </div>
         </div>
 
         <div className="admin-products__toolbar">
-          <p>{products.length} registros · imagens novas ficam no Supabase Storage.</p>
+          <p>{lineProducts.length} registros · imagens novas ficam no Supabase Storage.</p>
           <button type="button" onClick={() => openEditor()}>
-            <PackagePlus aria-hidden="true" /> Adicionar produto
+            <PackagePlus aria-hidden="true" />
+            {activeLine === "rotina" ? "Adicionar marmita" : "Adicionar produto"}
           </button>
         </div>
 
-        <div className="admin-product-grid">
+        {sortedProducts.length > 0 ? <div className="admin-product-grid">
           {sortedProducts.map((product) => {
             const dirty = dirtyKeys.has(product.key);
             const saving = savingKey === product.key;
@@ -283,11 +361,15 @@ export function AdminDashboard({
                     src={productImageUrl(product.image_path)}
                     alt=""
                   />
-                  <span>{categoryLabel(product.category)}</span>
+                  <span>
+                    {isRoutineProduct(product)
+                      ? "Linha Rotina"
+                      : categoryLabel(product.category)}
+                  </span>
                   {!product.active && (
                     <em><EyeOff aria-hidden="true" /> Inativo</em>
                   )}
-                  {product.stock_quantity <= 0 && (
+                  {product.persisted !== false && product.stock_quantity <= 0 && (
                     <strong><PackageX aria-hidden="true" /> Sem estoque</strong>
                   )}
                 </div>
@@ -307,9 +389,22 @@ export function AdminDashboard({
                     onClick={() => openEditor(product)}
                     disabled={saving}
                   >
-                    <Pencil aria-hidden="true" /> Editar informações e imagem
+                    <Pencil aria-hidden="true" />
+                    {product.persisted === false
+                      ? "Configurar este sabor"
+                      : "Editar informações e imagem"}
                   </button>
 
+                  {product.persisted === false ? (
+                    <div className="admin-product__setup">
+                      <strong>Sabor atual da página</strong>
+                      <p>
+                        Abra o editor para definir o estoque e passar a controlar
+                        esta marmita pelo painel.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
                   <label className="admin-stock-field">
                     <span><PackageCheck aria-hidden="true" /> Estoque atual</span>
                     <input
@@ -371,11 +466,19 @@ export function AdminDashboard({
                     {saving ? <LoaderCircle className="admin-spin" aria-hidden="true" /> : <Save aria-hidden="true" />}
                     {saving ? "Salvando" : dirty ? "Salvar alteração" : "Atualizado"}
                   </button>
+                    </>
+                  )}
                 </div>
               </article>
             );
           })}
-        </div>
+        </div> : (
+          <div className="admin-products__empty">
+            <Snowflake aria-hidden="true" />
+            <h3>Nenhuma marmita cadastrada</h3>
+            <p>Use “Adicionar marmita” para publicar o primeiro sabor da Linha Rotina.</p>
+          </div>
+        )}
       </section>
 
       <footer className="admin-footer">

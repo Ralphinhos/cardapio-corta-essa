@@ -16,6 +16,7 @@ export type AdminProduct = {
   tone: ProductTone;
   image_path: string;
   display_order: number;
+  persisted?: boolean;
 };
 
 export const adminProductFields =
