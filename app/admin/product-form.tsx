@@ -6,7 +6,6 @@ import { type FormEvent, useEffect, useState } from "react";
 import {
   type Category,
   type ProductTone,
-  catalogCategories,
   categoryLabel,
   productImageUrl,
 } from "@/lib/catalog";
@@ -34,23 +33,26 @@ type ProductDraft = {
   tone: ProductTone;
 };
 
-const emptyDraft = (): ProductDraft => ({
+const emptyDraft = (category: Category): ProductDraft => ({
   name: "",
-  category: "kit",
+  category,
   description: "",
   detail: "",
-  badgeText: "Feito para a brasa",
-  weight: "",
-  price: "",
+  badgeText: category === "rotina" ? "Vegetariano" : "Feito para a brasa",
+  weight: category === "rotina" ? "380 g" : "",
+  price: category === "rotina" ? "29.90" : "",
   stockQuantity: "0",
   isTopSeller: false,
   active: true,
   tone: "green",
 });
 
-const draftFromProduct = (product: AdminProduct): ProductDraft => ({
+const draftFromProduct = (
+  product: AdminProduct,
+  routineMode: boolean,
+): ProductDraft => ({
   name: product.name,
-  category: product.category,
+  category: routineMode ? "rotina" : product.category,
   description: product.description,
   detail: product.detail ?? "",
   badgeText: product.badge_text,
@@ -82,18 +84,24 @@ export function AdminProductForm({
   product,
   nextOrders,
   existingKeys,
+  initialCategory,
+  allowedCategories,
   onSaved,
   onCancel,
 }: {
   product: AdminProduct | null;
   nextOrders: Record<Category, number>;
   existingKeys: string[];
+  initialCategory: Category;
+  allowedCategories: readonly Category[];
   onSaved: (product: AdminProduct, created: boolean) => void;
   onCancel: () => void;
 }) {
   const editing = Boolean(product);
+  const routineMode = initialCategory === "rotina";
+  const storedProduct = Boolean(product && product.persisted !== false);
   const [draft, setDraft] = useState<ProductDraft>(() =>
-    product ? draftFromProduct(product) : emptyDraft(),
+    product ? draftFromProduct(product, routineMode) : emptyDraft(initialCategory),
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState(() =>
@@ -136,7 +144,10 @@ export function AdminProductForm({
 
     const name = draft.name.trim();
     const slug = product?.slug ?? slugify(name);
-    const key = product?.key ?? `${draft.category}-${slug}`;
+    const persistedCategory: Category = routineMode ? "unit" : draft.category;
+    const key =
+      product?.key ??
+      (routineMode ? `rotina-${slug}` : `${persistedCategory}-${slug}`);
     const price = Number(draft.price.replace(",", "."));
     const stockQuantity = Number(draft.stockQuantity);
 
@@ -192,7 +203,9 @@ export function AdminProductForm({
         name,
         description: draft.description.trim(),
         detail: draft.detail.trim() || null,
-        badge_text: draft.badgeText.trim() || "Feito para a brasa",
+        badge_text:
+          draft.badgeText.trim() ||
+          (draft.category === "rotina" ? "Vegetariano" : "Feito para a brasa"),
         weight: draft.weight.trim(),
         price_cents: Math.round(price * 100),
         stock_quantity: stockQuantity,
@@ -203,24 +216,26 @@ export function AdminProductForm({
         updated_at: new Date().toISOString(),
       };
 
-      const query = product
+      const query = storedProduct && product
         ? supabase
             .from("catalog_products")
             .update({
               ...values,
-              category: draft.category,
+              category: persistedCategory,
               display_order:
-                product.category === draft.category
+                routineMode || product.category === persistedCategory
                   ? product.display_order
-                  : nextOrders[draft.category],
+                  : nextOrders[persistedCategory],
             })
             .eq("key", product.key)
         : supabase.from("catalog_products").insert({
             ...values,
             key,
             slug,
-            category: draft.category,
-            display_order: nextOrders[draft.category],
+            category: persistedCategory,
+            display_order:
+              product?.display_order ??
+              nextOrders[routineMode ? "rotina" : persistedCategory],
           });
 
       const { data, error: saveError } = await query
@@ -245,7 +260,7 @@ export function AdminProductForm({
         await supabase.storage.from(IMAGE_BUCKET).remove([product.image_path]);
       }
 
-      onSaved(data as AdminProduct, !product);
+      onSaved(data as AdminProduct, !storedProduct);
     } catch (submitError) {
       if (uploadedPath && !persisted) {
         await supabase.storage.from(IMAGE_BUCKET).remove([uploadedPath]);
@@ -271,7 +286,9 @@ export function AdminProductForm({
           <p>
             {editing
               ? "A categoria pode ser alterada; o identificador interno é preservado para manter pedidos antigos."
-              : "Após salvar, o produto entra no fim da categoria selecionada."}
+              : draft.category === "rotina"
+                ? "A marmita aparecerá nos sabores e no montador de kits da página Linha Rotina."
+                : "Após salvar, o produto entra no fim da categoria selecionada."}
           </p>
         </div>
         <button type="button" className="admin-editor__close" onClick={onCancel} aria-label="Fechar formulário">
@@ -314,9 +331,9 @@ export function AdminProductForm({
               <select
                 value={draft.category}
                 onChange={(event) => updateDraft({ category: event.target.value as Category })}
-                disabled={submitting}
+                disabled={submitting || allowedCategories.length === 1}
               >
-                {catalogCategories.map((category) => (
+                {allowedCategories.map((category) => (
                   <option key={category} value={category}>
                     {categoryLabel(category)}
                   </option>
@@ -326,35 +343,60 @@ export function AdminProductForm({
           </div>
 
           <label>
-            <span>Descrição</span>
+            <span>
+              {draft.category === "rotina"
+                ? "Acompanhamentos e ingredientes"
+                : "Descrição"}
+            </span>
             <textarea
               value={draft.description}
               onChange={(event) => updateDraft({ description: event.target.value })}
               maxLength={500}
               rows={3}
+              placeholder={
+                draft.category === "rotina"
+                  ? "Digite um item por linha. Ex.:\nArroz branco\nBatata rústica\nFarofa"
+                  : undefined
+              }
               required
               disabled={submitting}
             />
           </label>
 
           <label>
-            <span>Detalhe opcional</span>
+            <span>
+              {draft.category === "rotina"
+                ? "Descrição complementar opcional"
+                : "Detalhe opcional"}
+            </span>
             <input
               value={draft.detail}
               onChange={(event) => updateDraft({ detail: event.target.value })}
               maxLength={300}
-              placeholder="Ex.: Marinada com shoyu e limão"
+              placeholder={
+                draft.category === "rotina"
+                  ? "Ex.: Molho preparado artesanalmente"
+                  : "Ex.: Marinada com shoyu e limão"
+              }
               disabled={submitting}
             />
           </label>
 
           <label>
-            <span>Selo curto do produto</span>
+            <span>
+              {draft.category === "rotina"
+                ? "Classificação da receita"
+                : "Selo curto do produto"}
+            </span>
             <input
               value={draft.badgeText}
               onChange={(event) => updateDraft({ badgeText: event.target.value })}
               maxLength={60}
-              placeholder="Ex.: Pronta para servir"
+              placeholder={
+                draft.category === "rotina"
+                  ? "Ex.: Vegetariano ou 100% vegano"
+                  : "Ex.: Pronta para servir"
+              }
               disabled={submitting}
             />
           </label>

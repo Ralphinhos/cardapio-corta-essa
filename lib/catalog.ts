@@ -1,4 +1,5 @@
-export const catalogCategories = ["kit", "unit", "combo"] as const;
+export const brasaCategories = ["kit", "unit", "combo"] as const;
+export const catalogCategories = [...brasaCategories, "rotina"] as const;
 export type Category = (typeof catalogCategories)[number];
 export type ProductTone = "green" | "orange";
 
@@ -13,6 +14,11 @@ const categoryMetadata: Record<
     pageLabel: "unidade",
   },
   combo: { label: "Combo", priceSuffix: "por combo", pageLabel: "combo" },
+  rotina: {
+    label: "Linha Rotina",
+    priceSuffix: "por refeição",
+    pageLabel: "marmita",
+  },
 };
 
 export const categoryLabel = (category: Category) =>
@@ -220,6 +226,40 @@ export const units: Product[] = [
   },
 ];
 
+export const routineProducts: Product[] = [
+  {
+    slug: "tropeiro",
+    name: "Tropeiro Vegano da Casa",
+    description: "Arroz branco\nCouve ao alho\nBatata-doce assada\nFarofa",
+    badgeText: "100% vegano",
+    weight: "380 g",
+    price: 29.9,
+    tone: "green",
+    imagePath: "/images/rotina/tropeiro.webp",
+  },
+  {
+    slug: "tirinhas",
+    name: "Tirinhas de Soja Marinadas",
+    description:
+      "Arroz branco\nFeijão-carioca\nAbóbora cabotiá\nBrócolis\nFarofa",
+    badgeText: "100% vegano",
+    weight: "380 g",
+    price: 29.9,
+    tone: "orange",
+    imagePath: "/images/rotina/tirinhas.webp",
+  },
+  {
+    slug: "parmegiana",
+    name: "Parmegiana de Soja",
+    description: "Arroz branco\nBatata rústica temperada\nFarofa",
+    badgeText: "Vegetariano",
+    weight: "380 g",
+    price: 29.9,
+    tone: "green",
+    imagePath: "/images/rotina/parmegiana.webp",
+  },
+];
+
 const withCatalogMetadata = (
   category: Category,
   products: Product[],
@@ -228,16 +268,21 @@ const withCatalogMetadata = (
     ...product,
     key: `${category}-${product.slug}`,
     category,
-    imagePath: `/images/${product.slug}-${category}.webp`,
+    imagePath:
+      product.imagePath ?? `/images/${product.slug}-${category}.webp`,
     displayOrder: index + 1,
     badgeText:
-      product.slug === "divine" ? "Pronta para servir" : "Feito para a brasa",
+      product.badgeText ??
+      (product.slug === "divine" ? "Pronta para servir" : "Feito para a brasa"),
   }));
 
 export const fallbackCatalog: CatalogProduct[] = [
   ...withCatalogMetadata("kit", kits),
   ...withCatalogMetadata("unit", units),
 ];
+
+export const fallbackRoutineCatalog: CatalogProduct[] =
+  withCatalogMetadata("rotina", routineProducts);
 
 export const formatPrice = (price: number) =>
   new Intl.NumberFormat("pt-BR", {

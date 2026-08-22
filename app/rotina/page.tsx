@@ -13,13 +13,19 @@ import {
   Leaf,
   MessageCircle,
   PackageCheck,
+  PackageX,
   Snowflake,
   Sparkles,
   Truck,
 } from "lucide-react";
 import { MetaTrackedLink } from "@/app/meta-tracked-link";
 import { VipWhatsAppButton } from "@/app/vip-whatsapp-button";
-import { whatsappNumber } from "@/lib/catalog";
+import {
+  productImageUrl,
+  stockAvailabilityLabel,
+  whatsappNumber,
+} from "@/lib/catalog";
+import { getRoutineProducts } from "@/lib/catalog-server";
 import { RotinaKitBuilder } from "./rotina-kit-builder";
 import styles from "./rotina.module.css";
 
@@ -29,48 +35,25 @@ export const metadata: Metadata = {
     "Marmitas vegetarianas gourmet congeladas de 380 g para uma rotina prática, saudável e cheia de sabor. Monte kits de 1, 5 ou 20 em Poços de Caldas.",
 };
 
-const flavors = [
-  {
-    number: "01",
-    name: "Tropeiro Vegano da Casa",
-    image: "/images/rotina/tropeiro.webp",
-    ingredients: [
-      "Arroz branco",
-      "Couve ao alho",
-      "Batata-doce assada",
-      "Farofa",
-    ],
-    label: "100% vegano",
-    tone: "lime",
-  },
-  {
-    number: "02",
-    name: "Tirinhas de Soja Marinadas",
-    image: "/images/rotina/tirinhas.webp",
-    ingredients: [
-      "Arroz branco",
-      "Feijão-carioca",
-      "Abóbora cabotiá",
-      "Brócolis",
-      "Farofa",
-    ],
-    label: "100% vegano",
-    tone: "orange",
-  },
-  {
-    number: "03",
-    name: "Parmegiana de Soja",
-    image: "/images/rotina/parmegiana.webp",
-    ingredients: ["Arroz branco", "Batata rústica temperada", "Farofa"],
-    label: "Vegetariano",
-    tone: "paper",
-  },
-] as const;
+export const dynamic = "force-dynamic";
+
+const flavorTones = ["lime", "orange", "paper"] as const;
+
+const ingredientList = (description: string) =>
+  description
+    .split(/\r?\n|,\s*/)
+    .map((ingredient) => ingredient.trim())
+    .filter(Boolean);
 
 const whatsappMessageUrl = (message: string) =>
   `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
-export default function RotinaPage() {
+export default async function RotinaPage() {
+  const routineProducts = (await getRoutineProducts()).toSorted(
+    (first, second) =>
+      first.displayOrder - second.displayOrder ||
+      first.name.localeCompare(second.name),
+  );
   const repeatOrderUrl = whatsappMessageUrl(
     "Olá! Já sou cliente da Corta Essa e quero repetir meu pedido da Linha Rotina. Podemos consultar minha última composição?",
   );
@@ -153,7 +136,7 @@ export default function RotinaPage() {
 
       <section className={styles.promiseBar} aria-label="Diferenciais da Linha Rotina">
         <div>
-          <strong>03</strong>
+          <strong>{String(routineProducts.length).padStart(2, "0")}</strong>
           <span>sabores para combinar</span>
         </div>
         <div>
@@ -203,40 +186,63 @@ export default function RotinaPage() {
           </div>
           <p>
             No Kit 5 e no Kit 20, você distribui as quantidades como preferir.
-            Misture os três ou repita aquele que já ganhou seu paladar.
+            Misture os sabores disponíveis ou repita aquele que já ganhou seu
+            paladar.
           </p>
         </div>
 
-        <div className={styles.flavorGrid}>
-          {flavors.map((flavor) => (
+        {routineProducts.length > 0 ? (
+          <div className={styles.flavorGrid}>
+          {routineProducts.map((flavor, index) => {
+            const outOfStock =
+              flavor.stockQuantity != null && flavor.stockQuantity <= 0;
+            return (
             <article
-              className={`${styles.flavorCard} ${styles[`flavorCard_${flavor.tone}`]}`}
-              key={flavor.number}
+              className={`${styles.flavorCard} ${styles[`flavorCard_${flavorTones[index % flavorTones.length]}`]}${outOfStock ? ` ${styles.flavorCardSoldOut}` : ""}`}
+              key={flavor.key}
             >
               <div className={styles.flavorVisual}>
-                <span>{flavor.number}</span>
+                <span>{String(index + 1).padStart(2, "0")}</span>
                 <img
-                  src={flavor.image}
+                  src={productImageUrl(flavor.imagePath)}
                   width="768"
                   height="1376"
                   alt={`Marmita ${flavor.name}`}
                   loading="lazy"
                   decoding="async"
                 />
-                <strong>{flavor.label}</strong>
+                <strong>{flavor.badgeText ?? "Vegetariano"}</strong>
+                {outOfStock ? (
+                  <em className={styles.flavorStock}>
+                    <PackageX aria-hidden="true" /> Indisponível
+                  </em>
+                ) : flavor.stockQuantity != null ? (
+                  <em className={styles.flavorStock}>
+                    <PackageCheck aria-hidden="true" />
+                    {stockAvailabilityLabel(flavor.stockQuantity)}
+                  </em>
+                ) : null}
               </div>
               <div className={styles.flavorContent}>
-                <span>380 g</span>
+                <span>{flavor.weight}</span>
                 <h3>{flavor.name}</h3>
                 <ul>
-                  {flavor.ingredients.map((ingredient) => (
+                  {ingredientList(flavor.description).map((ingredient) => (
                     <li key={ingredient}>{ingredient}</li>
                   ))}
                 </ul>
+                {flavor.detail && <p>{flavor.detail}</p>}
               </div>
             </article>
-          ))}
-        </div>
+          )})}
+          </div>
+        ) : (
+          <div className={styles.flavorEmpty}>
+            <PackageX aria-hidden="true" />
+            <h3>Novos sabores em preparação</h3>
+            <p>Fale com a equipe para consultar a próxima produção.</p>
+          </div>
+        )}
       </section>
 
       <section className={styles.kits} id="kits" aria-labelledby="kits-title">
@@ -254,7 +260,14 @@ export default function RotinaPage() {
           </p>
         </div>
 
-        <RotinaKitBuilder />
+        <RotinaKitBuilder
+          flavors={routineProducts.map((product) => ({
+            key: product.key,
+            name: product.name,
+            price: product.price,
+            stockQuantity: product.stockQuantity,
+          }))}
+        />
         <p className={styles.purchaseNote}>
           <Check aria-hidden="true" /> Todos os kits desta página são compras
           avulsas, sem renovação automática ou assinatura.
