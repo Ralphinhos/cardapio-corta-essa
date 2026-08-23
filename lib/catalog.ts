@@ -17,7 +17,7 @@ const categoryMetadata: Record<
   rotina: {
     label: "Linha Rotina",
     priceSuffix: "por refeição",
-    pageLabel: "marmita",
+    pageLabel: "produto da Linha Rotina",
   },
 };
 
