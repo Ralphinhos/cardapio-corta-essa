@@ -207,7 +207,7 @@ export default async function RotinaPage() {
                   src={productImageUrl(flavor.imagePath)}
                   width="768"
                   height="1376"
-                  alt={`Marmita ${flavor.name}`}
+                  alt={`Produto da Linha Rotina: ${flavor.name}`}
                   loading="lazy"
                   decoding="async"
                 />
