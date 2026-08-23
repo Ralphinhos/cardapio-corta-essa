@@ -287,7 +287,7 @@ export function AdminProductForm({
             {editing
               ? "A categoria pode ser alterada; o identificador interno é preservado para manter pedidos antigos."
               : draft.category === "rotina"
-                ? "A marmita aparecerá nos sabores e no montador de kits da página Linha Rotina."
+                ? "O produto aparecerá na página Linha Rotina. Marmitas completas e pratos individuais usam esta mesma categoria."
                 : "Após salvar, o produto entra no fim da categoria selecionada."}
           </p>
         </div>
@@ -311,7 +311,11 @@ export function AdminProductForm({
               onChange={(event) => chooseImage(event.target.files?.[0] ?? null)}
             />
           </label>
-          <small>JPG, PNG ou WebP · máximo 5 MB.</small>
+          <small>
+            {routineMode
+              ? "PNG ou WebP com fundo transparente recomendado · máximo 5 MB."
+              : "JPG, PNG ou WebP · máximo 5 MB."}
+          </small>
         </div>
 
         <div className="admin-editor__fields">
@@ -345,7 +349,7 @@ export function AdminProductForm({
           <label>
             <span>
               {draft.category === "rotina"
-                ? "Acompanhamentos e ingredientes"
+                ? "Composição, acompanhamentos e ingredientes"
                 : "Descrição"}
             </span>
             <textarea
