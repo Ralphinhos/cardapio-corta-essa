@@ -303,7 +303,7 @@ export function AdminDashboard({
           onClick={() => selectLine("rotina")}
         >
           <Snowflake aria-hidden="true" />
-          <span><strong>Linha Rotina</strong><small>{products.filter(isRoutineProduct).length} marmitas</small></span>
+          <span><strong>Linha Rotina</strong><small>{products.filter(isRoutineProduct).length} produtos</small></span>
         </button>
       </nav>
 
@@ -332,11 +332,11 @@ export function AdminDashboard({
           <span>01 / {activeLine === "rotina" ? "Linha Rotina" : "Linha Brasa"}</span>
           <div>
             <h2>
-              {activeLine === "rotina" ? "Marmitas cadastradas" : "Catálogo da Brasa"}
+              {activeLine === "rotina" ? "Produtos cadastrados" : "Catálogo da Brasa"}
             </h2>
             <p>
               {activeLine === "rotina"
-                ? "Cada marmita ativa aparece automaticamente nos sabores e no montador de kits."
+                ? "Marmitas completas e pratos individuais ficam na mesma linha e aparecem automaticamente na página."
                 : "Estoque zero bloqueia a compra; produto inativo some do cardápio."}
             </p>
           </div>
@@ -346,7 +346,7 @@ export function AdminDashboard({
           <p>{lineProducts.length} registros · imagens novas ficam no Supabase Storage.</p>
           <button type="button" onClick={() => openEditor()}>
             <PackagePlus aria-hidden="true" />
-            {activeLine === "rotina" ? "Adicionar marmita" : "Adicionar produto"}
+            Adicionar produto
           </button>
         </div>
 
@@ -397,10 +397,10 @@ export function AdminDashboard({
 
                   {product.persisted === false ? (
                     <div className="admin-product__setup">
-                      <strong>Sabor atual da página</strong>
+                      <strong>Produto atual da página</strong>
                       <p>
                         Abra o editor para definir o estoque e passar a controlar
-                        esta marmita pelo painel.
+                        este produto pelo painel.
                       </p>
                     </div>
                   ) : (
@@ -475,8 +475,8 @@ export function AdminDashboard({
         </div> : (
           <div className="admin-products__empty">
             <Snowflake aria-hidden="true" />
-            <h3>Nenhuma marmita cadastrada</h3>
-            <p>Use “Adicionar marmita” para publicar o primeiro sabor da Linha Rotina.</p>
+            <h3>Nenhum produto cadastrado</h3>
+            <p>Use “Adicionar produto” para publicar uma marmita completa ou um prato individual.</p>
           </div>
         )}
       </section>
