@@ -37,8 +37,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-const flavorTones = ["lime", "orange", "paper"] as const;
-
 const ingredientList = (description: string) =>
   description
     .split(/\r?\n|,\s*/)
@@ -55,7 +53,7 @@ export default async function RotinaPage() {
       first.name.localeCompare(second.name),
   );
   const repeatOrderUrl = whatsappMessageUrl(
-    "Olá! Já sou cliente da Corta Essa e quero repetir meu pedido da Linha Rotina. Podemos consultar minha última composição?",
+    "Olá! Já sou cliente do Corta Essa e quero repetir meu pedido da Linha Rotina. Podemos consultar minha última composição?",
   );
 
   return (
@@ -159,7 +157,7 @@ export default async function RotinaPage() {
             Seu dia pode ser corrido. Sua comida não precisa ter pressa.
           </h2>
           <p>
-            A Linha Rotina leva a técnica e o cuidado da Corta Essa para o prato
+            A Linha Rotina leva a técnica e o cuidado do Corta Essa para o prato
             de todos os dias. Comida vegetal completa, generosa e cheia de
             personalidade — feita para alimentar bem e dar vontade de repetir.
           </p>
@@ -196,9 +194,11 @@ export default async function RotinaPage() {
           {routineProducts.map((flavor, index) => {
             const outOfStock =
               flavor.stockQuantity != null && flavor.stockQuantity <= 0;
+            const isUploadedProductImage =
+              !flavor.imagePath.startsWith("/images/rotina/");
             return (
             <article
-              className={`${styles.flavorCard} ${styles[`flavorCard_${flavorTones[index % flavorTones.length]}`]}${outOfStock ? ` ${styles.flavorCardSoldOut}` : ""}`}
+              className={`${styles.flavorCard} ${styles[`flavorCard_${flavor.tone}`]}${outOfStock ? ` ${styles.flavorCardSoldOut}` : ""}`}
               key={flavor.key}
             >
               <div className={styles.flavorVisual}>
@@ -210,6 +210,11 @@ export default async function RotinaPage() {
                   alt={`Produto da Linha Rotina: ${flavor.name}`}
                   loading="lazy"
                   decoding="async"
+                  className={
+                    isUploadedProductImage
+                      ? styles.flavorImageProduct
+                      : styles.flavorImageLegacy
+                  }
                 />
                 <strong>{flavor.badgeText ?? "Vegetariano"}</strong>
                 {outOfStock ? (
@@ -378,7 +383,7 @@ export default async function RotinaPage() {
             <span>O Grupo VIP fica sempre disponível no canto da página.</span>
           </div>
         </div>
-        <div className={styles.communityCycle} aria-label="Como a Corta Essa evolui com a comunidade">
+        <div className={styles.communityCycle} aria-label="Como o Corta Essa evolui com a comunidade">
           <div><strong>01</strong><span>Você prova</span></div>
           <div><strong>02</strong><span>A gente conversa</span></div>
           <div><strong>03</strong><span>A cozinha evolui</span></div>
@@ -451,7 +456,7 @@ export default async function RotinaPage() {
               loading="lazy"
               alt="Corta Essa!"
             />
-            <strong>Alta gastronomia vegetal, da celebração ao dia a dia.</strong>
+            <strong>Alta Gastronomia Vegetal, do Churrasco ao dia a dia</strong>
           </div>
           <nav aria-label="Navegação do rodapé">
             <span>Navegue</span>

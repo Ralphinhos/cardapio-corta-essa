@@ -584,6 +584,20 @@
   background: var(--paper-warm);
 }
 
+.admin-image-field--tone-green,
+.admin-image-field--tone-green:hover,
+.admin-image-field--tone-green:focus-within {
+  border-style: solid;
+  background: var(--green);
+}
+
+.admin-image-field--tone-orange,
+.admin-image-field--tone-orange:hover,
+.admin-image-field--tone-orange:focus-within {
+  border-style: solid;
+  background: var(--orange);
+}
+
 .admin-image-field > span {
   display: flex;
   align-items: center;
