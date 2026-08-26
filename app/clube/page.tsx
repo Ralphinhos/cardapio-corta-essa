@@ -13,9 +13,9 @@ import {
   Truck,
   WalletCards,
 } from "lucide-react";
+import { whatsappNumber } from "@/lib/catalog";
 import { MetaTrackedLink } from "@/app/meta-tracked-link";
 import { VipWhatsAppButton } from "@/app/vip-whatsapp-button";
-import { whatsappNumber } from "@/lib/catalog";
 import styles from "./clube.module.css";
 
 export const metadata: Metadata = {
@@ -79,7 +79,7 @@ const plans: Plan[] = [
     level: "Plano 03",
     name: "Assinatura 360°",
     badge: "Completa",
-    profile: "Brasa e Rotina juntas para viver a Corta Essa por inteiro.",
+    profile: "Brasa e Rotina juntas para viver o Corta Essa por inteiro.",
     price: 669,
     summary: "Brasa + 20 marmitas por ciclo",
     saving: 115,
@@ -111,19 +111,25 @@ const clubWhatsAppUrl = (plan?: string) => {
   return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 };
 
+function ChampionMedal() {
+  return (
+    <span className={styles.championMedal} aria-label="Assinatura 360°, plano mais completo">
+      <span className={styles.championMedalRibbons} aria-hidden="true" />
+      <span className={styles.championMedalRosette} aria-hidden="true">
+        <span className={styles.championMedalSeal}>
+          <Flame />
+          <strong>360°</strong>
+          <span>mais completo</span>
+        </span>
+      </span>
+    </span>
+  );
+}
+
 export default function ClubPage() {
   return (
     <main className={styles.page}>
       <section className={styles.hero} id="inicio">
-        <img
-          className={styles.heroGhostWord}
-          src="/images/mensal-type.webp"
-          width="1600"
-          height="800"
-          alt=""
-          aria-hidden="true"
-          decoding="async"
-        />
         <header className={styles.header}>
           <Link className={styles.logo} href="/" aria-label="Voltar ao cardápio Corta Essa!">
             <img
@@ -242,10 +248,10 @@ export default function ClubPage() {
         </div>
         <div className={styles.introCopy}>
           <p className={styles.kicker}>Não é uma caixa surpresa.</p>
-          <h2 id="club-intro-title">É a Corta Essa presente nos seus dias.</h2>
+          <h2 id="club-intro-title">É o Corta Essa presente nos seus dias.</h2>
           <p>
             A cada ciclo, você escolhe seus kits Brasa, suas marmitas ou os dois.
-            A Corta Essa reserva, prepara e organiza tudo em uma experiência
+            O Corta Essa reserva, prepara e organiza tudo em uma experiência
             artesanal, próxima e previsível.
           </p>
         </div>
@@ -283,22 +289,13 @@ export default function ClubPage() {
             >
               <div className={styles.planTopline}>
                 <span>{plan.level}</span>
-                <span>{plan.badge}</span>
+                {plan.featured ? (
+                  <ChampionMedal />
+                ) : (
+                  <span>{plan.badge}</span>
+                )}
               </div>
-              {plan.featured && (
-                <img
-                  className={styles.featuredMedal}
-                  src="/images/club-champion-medal.webp"
-                  width="512"
-                  height="512"
-                  loading="lazy"
-                  decoding="async"
-                  alt="Plano mais completo"
-                />
-              )}
-              <div
-                className={`${styles.planTitle}${plan.featured ? ` ${styles.planTitleFeatured}` : ""}`}
-              >
+              <div className={styles.planTitle}>
                 <h3>{plan.name}</h3>
                 <p>{plan.profile}</p>
               </div>
@@ -331,7 +328,9 @@ export default function ClubPage() {
                 metaParameters={{
                   content_name: plan.name,
                   content_category: "Clube de assinaturas",
-                  content_ids: [plan.id],
+                  content_ids: [
+                    plan.id,
+                  ],
                   content_type: "product",
                   currency: "BRL",
                   num_items: 1,
@@ -459,7 +458,7 @@ export default function ClubPage() {
             <summary>Posso escolher os sabores todos os meses?</summary>
             <p>
               Sim. Na Brasa, você escolhe os kits disponíveis no ciclo. Nas
-              Marmitas, combina livremente os três sabores da Linha Rotina.
+              Marmitas, combine livremente os três sabores da Linha Rotina.
             </p>
           </details>
           <details>
@@ -503,7 +502,7 @@ export default function ClubPage() {
           <h2 id="final-cta-title">Brasa e rotina podem caminhar juntas.</h2>
           <p>
             Escolha uma linha ou entre no 360° para viver a experiência completa
-            da Corta Essa todos os meses.
+            do Corta Essa todos os meses.
           </p>
         </div>
         <MetaTrackedLink
