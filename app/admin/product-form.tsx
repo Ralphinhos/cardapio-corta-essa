@@ -298,7 +298,9 @@ export function AdminProductForm({
 
       <form className="admin-editor__form" onSubmit={submit}>
         <div className="admin-editor__image-column">
-          <label className={`admin-image-field${imagePreview ? " admin-image-field--filled" : ""}`}>
+          <label
+            className={`admin-image-field${imagePreview ? " admin-image-field--filled" : ""}${routineMode ? ` admin-image-field--tone-${draft.tone}` : ""}`}
+          >
             {imagePreview ? (
               <img src={imagePreview} alt="Prévia do produto" />
             ) : (
@@ -313,7 +315,7 @@ export function AdminProductForm({
           </label>
           <small>
             {routineMode
-              ? "PNG ou WebP com fundo transparente recomendado · máximo 5 MB."
+              ? "PNG ou WebP sem fundo · escolha abaixo o verde ou o laranja · máximo 5 MB."
               : "JPG, PNG ou WebP · máximo 5 MB."}
           </small>
         </div>
@@ -451,7 +453,7 @@ export function AdminProductForm({
           </div>
 
           <fieldset className="admin-tone-field">
-            <legend>Cor do card</legend>
+            <legend>{routineMode ? "Cor do fundo da foto" : "Cor do card"}</legend>
             <label>
               <input
                 type="radio"
