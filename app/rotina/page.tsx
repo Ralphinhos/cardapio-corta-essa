@@ -69,7 +69,7 @@ export default async function RotinaPage() {
             />
           </Link>
           <nav aria-label="Navegação da Linha Rotina">
-            <Link href="/#cardapio">Brasa</Link>
+            <Link href="/">Brasa</Link>
             <a href="#sabores">Sabores</a>
             <a href="#kits">Kits</a>
             <Link className={styles.headerCta} href="/clube">
@@ -424,12 +424,15 @@ export default async function RotinaPage() {
             </p>
           </details>
           <details>
-            <summary>Como funciona a entrega?</summary>
+            <summary>Como funcionam as rotas de entrega?</summary>
             <p>
-              As rotas dos kits são programadas para todos os domingos em Poços
-              de Caldas. Para entregas individuais, consulte taxa,
-              disponibilidade e horário diretamente pelo WhatsApp. Frete grátis
-              para pedidos acima de R$ 200.
+              As entregas são realizadas todos os domingos em Poços de Caldas.
+              Para entrar na rota mais próxima, o pedido deve ser confirmado com
+              pelo menos 48 horas de antecedência. Na prática, pedidos feitos até
+              sexta-feira entram na entrega de domingo; pedidos feitos no sábado
+              seguem para a rota do domingo seguinte. Para entregas individuais,
+              consulte taxa, disponibilidade e horário diretamente pelo WhatsApp.
+              Frete grátis para pedidos acima de R$ 200.
             </p>
           </details>
         </div>
