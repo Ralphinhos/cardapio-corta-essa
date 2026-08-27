@@ -140,7 +140,7 @@ export default function ClubPage() {
             />
           </Link>
           <nav aria-label="Navegação do Clube">
-            <Link href="/#cardapio">Cardápio</Link>
+            <Link href="/">Brasa</Link>
             <Link href="/rotina">Rotina</Link>
             <a href="#como-funciona">Como funciona</a>
             <a className={styles.headerCta} href="#planos">Ver planos</a>

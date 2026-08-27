@@ -382,6 +382,13 @@
   height: 86%;
 }
 
+.productFrameRight img {
+  width: 94%;
+  height: 118%;
+  object-position: center;
+  translate: 0 -2%;
+}
+
 .priceSeal {
   position: absolute;
   z-index: 7;

@@ -623,21 +623,15 @@
   background:
     radial-gradient(
       circle at center,
-      transparent 0 27%,
-      rgba(9, 30, 23, 0.23) 27.5% 28%,
-      transparent 28.5%
+      transparent 0 36%,
+      rgba(9, 30, 23, 0.23) 36.5% 37%,
+      transparent 37.5%
     ),
     radial-gradient(
       circle at 106% 90%,
       transparent 0 17%,
       rgba(9, 30, 23, 0.17) 17.5% 18%,
       transparent 18.5%
-    ),
-    radial-gradient(
-      circle at -8% 12%,
-      transparent 0 13%,
-      rgba(9, 30, 23, 0.13) 13.5% 14%,
-      transparent 14.5%
     ),
     var(--photo-background, var(--green));
   place-items: center;
