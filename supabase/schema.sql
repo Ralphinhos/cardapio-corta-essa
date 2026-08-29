@@ -135,7 +135,7 @@ create table if not exists public.orders (
 create table if not exists public.order_items (
   id bigint generated always as identity primary key,
   order_id uuid not null references public.orders(id) on delete cascade,
-  product_key text not null references public.catalog_products(key),
+  product_key text references public.catalog_products(key) on delete set null,
   name_snapshot text not null,
   category text not null check (category in ('kit', 'unit', 'combo')),
   weight_snapshot text not null,
@@ -207,6 +207,34 @@ $$;
 
 revoke all on function public.is_catalog_admin() from public, anon;
 grant execute on function public.is_catalog_admin() to authenticated;
+
+create or replace function public.delete_catalog_product(p_key text)
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_image_path text;
+begin
+  if not public.is_catalog_admin() then
+    raise exception 'Acesso administrativo necessário.';
+  end if;
+
+  delete from public.catalog_products
+   where key = p_key
+   returning image_path into v_image_path;
+
+  if not found then
+    raise exception 'Produto não encontrado.';
+  end if;
+
+  return v_image_path;
+end;
+$$;
+
+revoke all on function public.delete_catalog_product(text) from public, anon;
+grant execute on function public.delete_catalog_product(text) to authenticated;
 
 drop policy if exists "catalog_products_public_read" on public.catalog_products;
 create policy "catalog_products_public_read"

@@ -6,7 +6,6 @@ import {
 } from "@/app/admin/product-types";
 import { hasSupabasePublicConfig } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { fallbackRoutineCatalog } from "@/lib/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -57,32 +56,11 @@ export default async function AdminPage() {
     ...product,
     persisted: true,
   }));
-  const databaseKeys = new Set(databaseProducts.map((product) => product.key));
-  const routineFallbacks: AdminProduct[] = fallbackRoutineCatalog
-    .filter((product) => !databaseKeys.has(product.key))
-    .map((product) => ({
-      key: product.key,
-      slug: product.slug,
-      category: "unit",
-      name: product.name,
-      description: product.description,
-      detail: product.detail ?? null,
-      badge_text: product.badgeText ?? "Vegetariano",
-      weight: product.weight,
-      price_cents: Math.round(product.price * 100),
-      stock_quantity: 0,
-      is_top_seller: false,
-      active: true,
-      tone: product.tone,
-      image_path: product.imagePath,
-      display_order: product.displayOrder,
-      persisted: false,
-    }));
 
   return (
     <AdminDashboard
       email={user.email ?? "administrador"}
-      initialProducts={[...databaseProducts, ...routineFallbacks]}
+      initialProducts={databaseProducts}
     />
   );
 }

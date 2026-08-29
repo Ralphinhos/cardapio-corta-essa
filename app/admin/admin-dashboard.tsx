@@ -16,10 +16,12 @@ import {
   ShieldCheck,
   Snowflake,
   Sparkles,
+  Trash2,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { AdminProductForm } from "@/app/admin/product-form";
 import type { AdminProduct } from "@/app/admin/product-types";
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
@@ -53,6 +55,10 @@ export function AdminDashboard({
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<AdminProduct | null>(null);
   const [activeLine, setActiveLine] = useState<AdminLine>("brasa");
+  const [productPendingDelete, setProductPendingDelete] =
+    useState<AdminProduct | null>(null);
+  const [deletingKey, setDeletingKey] = useState<string | null>(null);
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
 
   const lineProducts = useMemo(
     () =>
@@ -233,6 +239,69 @@ export function AdminDashboard({
         : `${savedProduct.name} atualizado.`,
     });
     closeEditor();
+    router.refresh();
+  }
+
+  function requestDelete(product: AdminProduct) {
+    setProductPendingDelete(product);
+    setFeedback(null);
+    window.requestAnimationFrame(() => deleteDialogRef.current?.showModal());
+  }
+
+  function closeDeleteDialog() {
+    if (deletingKey) return;
+    deleteDialogRef.current?.close();
+    setProductPendingDelete(null);
+  }
+
+  async function deleteProduct() {
+    if (!productPendingDelete || deletingKey) return;
+
+    const product = productPendingDelete;
+    setDeletingKey(product.key);
+    setFeedback(null);
+
+    const supabase = createSupabaseBrowserClient();
+    const { data: deletedImagePath, error } = await supabase.rpc(
+      "delete_catalog_product",
+      { p_key: product.key },
+    );
+
+    if (error) {
+      setFeedback({
+        kind: "error",
+        message:
+          "Não foi possível excluir o produto. Confirme se a migration de exclusão foi executada no Supabase.",
+      });
+      setDeletingKey(null);
+      return;
+    }
+
+    if (
+      typeof deletedImagePath === "string" &&
+      deletedImagePath &&
+      !deletedImagePath.startsWith("/") &&
+      !/^https?:\/\//i.test(deletedImagePath)
+    ) {
+      await supabase.storage.from("product-images").remove([deletedImagePath]);
+    }
+
+    setProducts((current) =>
+      current.filter((item) => item.key !== product.key),
+    );
+    setDirtyKeys((current) => {
+      const next = new Set(current);
+      next.delete(product.key);
+      return next;
+    });
+    if (editingProduct?.key === product.key) closeEditor();
+    setDeletingKey(null);
+    deleteDialogRef.current?.close();
+    setProductPendingDelete(null);
+    setFeedback({
+      kind: "success",
+      message: `${product.name} foi excluído permanentemente.`,
+    });
     router.refresh();
   }
 
@@ -457,15 +526,27 @@ export function AdminDashboard({
                     />
                   </label>
 
-                  <button
-                    className="admin-product__save"
-                    type="button"
-                    onClick={() => saveProduct(product)}
-                    disabled={!dirty || saving}
-                  >
-                    {saving ? <LoaderCircle className="admin-spin" aria-hidden="true" /> : <Save aria-hidden="true" />}
-                    {saving ? "Salvando" : dirty ? "Salvar alteração" : "Atualizado"}
-                  </button>
+                  <div className="admin-product__actions">
+                    <button
+                      className="admin-product__save"
+                      type="button"
+                      onClick={() => saveProduct(product)}
+                      disabled={!dirty || saving || deletingKey === product.key}
+                    >
+                      {saving ? <LoaderCircle className="admin-spin" aria-hidden="true" /> : <Save aria-hidden="true" />}
+                      {saving ? "Salvando" : dirty ? "Salvar alteração" : "Atualizado"}
+                    </button>
+                    <button
+                      className="admin-product__delete"
+                      type="button"
+                      onClick={() => requestDelete(product)}
+                      disabled={saving || deletingKey === product.key}
+                      aria-label={`Excluir permanentemente ${product.name}`}
+                    >
+                      <Trash2 aria-hidden="true" />
+                      Excluir produto
+                    </button>
+                  </div>
                     </>
                   )}
                 </div>
@@ -480,6 +561,57 @@ export function AdminDashboard({
           </div>
         )}
       </section>
+
+      <dialog
+        ref={deleteDialogRef}
+        className="admin-delete-dialog"
+        aria-labelledby="admin-delete-title"
+        aria-describedby="admin-delete-description"
+        onCancel={(event) => {
+          if (deletingKey) event.preventDefault();
+        }}
+        onClose={() => {
+          if (!deletingKey) setProductPendingDelete(null);
+        }}
+      >
+        <button
+          type="button"
+          className="admin-delete-dialog__close"
+          onClick={closeDeleteDialog}
+          disabled={Boolean(deletingKey)}
+          aria-label="Fechar confirmação"
+        >
+          <X aria-hidden="true" />
+        </button>
+        <span><AlertTriangle aria-hidden="true" /> Exclusão permanente</span>
+        <h2 id="admin-delete-title">Excluir este produto?</h2>
+        <p id="admin-delete-description">
+          <strong>{productPendingDelete?.name}</strong> será removido do catálogo e
+          não poderá ser recuperado pelo painel. Os registros de pedidos antigos
+          serão preservados.
+        </p>
+        <div className="admin-delete-dialog__actions">
+          <button
+            type="button"
+            onClick={closeDeleteDialog}
+            disabled={Boolean(deletingKey)}
+          >
+            Manter produto
+          </button>
+          <button
+            type="button"
+            onClick={deleteProduct}
+            disabled={Boolean(deletingKey)}
+          >
+            {deletingKey ? (
+              <LoaderCircle className="admin-spin" aria-hidden="true" />
+            ) : (
+              <Trash2 aria-hidden="true" />
+            )}
+            {deletingKey ? "Excluindo" : "Excluir permanentemente"}
+          </button>
+        </div>
+      </dialog>
 
       <footer className="admin-footer">
         <Flame aria-hidden="true" /> Alterações publicadas diretamente no cardápio.

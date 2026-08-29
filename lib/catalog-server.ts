@@ -169,29 +169,9 @@ export async function getRoutineProducts(): Promise<CatalogProduct[]> {
   }
 
   const rows = (data ?? []) as CatalogRow[];
-  if (rows.length === 0) return fallbackRoutineCatalog;
-
-  const activeDatabaseProducts = mapCatalogRows(
-    rows.filter((row) => row.active === true),
-  ).map((product) => ({ ...product, category: "rotina" as const }));
-  const databaseKeys = new Set(
-    rows.flatMap((row) => (typeof row.key === "string" ? [row.key] : [])),
-  );
-  const productsByKey = new Map(
-    activeDatabaseProducts.map((product) => [product.key, product]),
-  );
-  const fallbackKeys = new Set(
-    fallbackRoutineCatalog.map((product) => product.key),
-  );
-
-  return [
-    ...fallbackRoutineCatalog.flatMap((product) => {
-      if (!databaseKeys.has(product.key)) return [product];
-      const databaseProduct = productsByKey.get(product.key);
-      return databaseProduct ? [databaseProduct] : [];
-    }),
-    ...activeDatabaseProducts.filter((product) => !fallbackKeys.has(product.key)),
-  ].toSorted(
+  return mapCatalogRows(rows.filter((row) => row.active === true))
+    .map((product) => ({ ...product, category: "rotina" as const }))
+    .toSorted(
     (first, second) =>
       first.displayOrder - second.displayOrder ||
       first.name.localeCompare(second.name),
