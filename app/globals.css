@@ -160,12 +160,12 @@ button:focus-visible {
   letter-spacing: 0.015em;
 }
 
-.topbar nav > a:not(.topbar__social) {
+.topbar nav > a:not(.topbar__social):not(.topbar__club-link) {
   position: relative;
   padding: 18px 0 13px;
 }
 
-.topbar nav > a:not(.topbar__social)::after {
+.topbar nav > a:not(.topbar__social):not(.topbar__club-link)::after {
   position: absolute;
   right: 0;
   bottom: 7px;
@@ -188,15 +188,14 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 9px;
-  min-width: 116px;
+  min-width: 126px;
   min-height: 44px;
-  padding: 11px 18px 9px;
+  padding: 11px 20px 9px;
   border: 1.5px solid var(--orange);
   border-radius: 999px;
   background: var(--orange);
-  box-shadow: 0 5px 0 rgba(122, 34, 17, 0.52);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
   color: var(--paper);
-  text-align: center;
   transition: background-color 180ms ease, border-color 180ms ease,
     box-shadow 180ms ease, color 180ms ease, transform 180ms ease;
 }
@@ -208,15 +207,20 @@ button:focus-visible {
 .topbar__club-link > svg {
   width: 17px;
   height: 17px;
+  flex: 0 0 auto;
   color: var(--green-deeper);
   fill: currentColor;
   stroke-width: 1.8;
 }
 
+.topbar__club-link > span {
+  line-height: 1;
+}
+
 .topbar nav > .topbar__club-link:hover {
-  border-color: #ff653e;
-  background: #ff653e;
-  box-shadow: 0 7px 0 rgba(122, 34, 17, 0.42);
+  border-color: #ff6843;
+  background: #ff6843;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.2);
   color: var(--paper);
   transform: translateY(-2px);
 }
@@ -924,6 +928,14 @@ button:focus-visible {
   line-height: 1;
 }
 
+.featured-card__footer > div > small {
+  color: var(--green-dark);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
 .featured-card__footer a,
 .featured-card__footer button,
 .featured-card__unavailable {
@@ -1284,6 +1296,42 @@ button:focus-visible {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+.product-card__footer > div small {
+  margin-top: 3px;
+  color: var(--green-dark);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.payment-methods-note {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  max-width: 860px;
+  margin: 24px 0 34px;
+  padding: 15px 17px 13px;
+  border: 1px solid rgba(23, 48, 40, 0.16);
+  border-left: 4px solid var(--green);
+  background: rgba(127, 196, 41, 0.1);
+  color: var(--green-deep);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.payment-methods-note svg {
+  width: 18px;
+  height: 18px;
+  color: var(--orange-dark);
+}
+
+.payment-methods-note strong {
+  font-weight: 700;
 }
 
 .product-card__footer a,
@@ -2058,6 +2106,38 @@ footer {
   line-height: 1;
 }
 
+.checkout-total > div {
+  display: grid;
+  justify-items: end;
+  gap: 3px;
+}
+
+.checkout-total small,
+.checkout-line__price-note,
+.checkout-success__price-note {
+  color: var(--green-dark);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.checkout-line__price-note {
+  display: block;
+  margin-top: 3px;
+}
+
+.checkout-payment-note {
+  margin: 12px 0 0;
+  padding: 12px 13px 10px;
+  border-left: 3px solid var(--green);
+  background: rgba(127, 196, 41, 0.1);
+  color: var(--green-deep);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
 .checkout-summary__note {
   margin: 10px 0 0;
   color: var(--muted);
@@ -2330,6 +2410,15 @@ footer {
   font-weight: 400;
 }
 
+.checkout-success__price-note {
+  margin-top: 3px;
+}
+
+.checkout-success .checkout-payment-note {
+  max-width: 520px;
+  text-align: left;
+}
+
 .checkout-success a {
   margin-top: 16px;
   background: var(--green-deeper);
@@ -2506,8 +2595,8 @@ footer {
   }
 
   .topbar nav > .topbar__club-link {
-    gap: 6px;
-    min-width: 102px;
+    gap: 7px;
+    min-width: 110px;
     min-height: 40px;
     padding: 9px 14px 7px;
   }
@@ -2518,6 +2607,10 @@ footer {
   }
 
   .topbar__social {
+    display: none;
+  }
+
+  .topbar__secondary-link {
     display: none;
   }
 
@@ -2822,22 +2915,15 @@ footer {
   }
 }
 
-@media (max-width: 760px) {
-  .topbar__secondary-link {
-    display: none;
-  }
-}
-
 @media (max-width: 420px) {
-
   .topbar nav {
     gap: 12px;
     font-size: 0.76rem;
   }
 
   .topbar nav > .topbar__club-link {
-    min-width: 94px;
-    padding-inline: 12px;
+    min-width: 92px;
+    padding-inline: 11px;
   }
 
   .hero h1 {

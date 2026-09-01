@@ -11,6 +11,7 @@ import {
   PackageOpen,
   PackageX,
   ShoppingBag,
+  WalletCards,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
@@ -101,6 +102,7 @@ function ProductCard({
             <div>
               <strong>{formatPrice(product.price)}</strong>
               <span>{categoryPriceSuffix(category)}</span>
+              <small>no Pix</small>
             </div>
             {orderingEnabled ? (
               <button
@@ -378,7 +380,7 @@ export function MenuClient({
                 alt=""
               />
             </div>
-            <span className="hero-collage__note">Vegetariano artesanal</span>
+            <span className="hero-collage__note">100% vegetal</span>
           </div>
         </div>
       </section>
@@ -444,6 +446,7 @@ export function MenuClient({
                     <div>
                       <span>{product.weight}</span>
                       <strong>{formatPrice(product.price)}</strong>
+                      <small>no Pix</small>
                     </div>
                     {orderingEnabled ? (
                       <button
@@ -532,6 +535,15 @@ export function MenuClient({
             ))}
           </div>
         </div>
+
+        <p className="payment-methods-note">
+          <WalletCards aria-hidden="true" />
+          <span>
+            <strong>Todos os preços desta página são no Pix.</strong> Também
+            aceitamos crédito e débito. O valor final, com as taxas da operadora,
+            será informado antes da confirmação do pedido.
+          </span>
+        </p>
 
         <div
           className="product-grid"

@@ -32,7 +32,7 @@ import styles from "./rotina.module.css";
 export const metadata: Metadata = {
   title: "Linha Rotina | Corta Essa!",
   description:
-    "Marmitas vegetarianas gourmet congeladas de 380 g para uma rotina prática, saudável e cheia de sabor. Monte kits de 1, 5 ou 20 em Poços de Caldas.",
+    "Marmitas vegetarianas gourmet congeladas de 380 g para uma rotina prática, saudável e cheia de sabor. Combine de 1 a 30 refeições em Poços de Caldas.",
 };
 
 export const dynamic = "force-dynamic";
@@ -69,7 +69,7 @@ export default async function RotinaPage() {
             />
           </Link>
           <nav aria-label="Navegação da Linha Rotina">
-            <Link href="/">Brasa</Link>
+            <Link href="/#cardapio">Brasa</Link>
             <a href="#sabores">Sabores</a>
             <a href="#kits">Kits</a>
             <Link className={styles.headerCta} href="/clube">
@@ -97,7 +97,7 @@ export default async function RotinaPage() {
             <div className={styles.heroActions}>
               <a className={styles.primaryAction} href="#kits">
                 <PackageCheck aria-hidden="true" />
-                Montar meu kit
+                Montar meu pedido
                 <span aria-hidden="true">↓</span>
               </a>
               <a className={styles.secondaryAction} href="#sabores">
@@ -183,9 +183,9 @@ export default async function RotinaPage() {
             <h2 id="flavors-title">Escolha seus sabores favoritos.</h2>
           </div>
           <p>
-            No Kit 5 e no Kit 20, você distribui as quantidades como preferir.
-            Misture os sabores disponíveis ou repita aquele que já ganhou seu
-            paladar.
+            Você distribui as quantidades como preferir. Misture os sabores
+            disponíveis ou repita aquele que já ganhou seu paladar. O preço por
+            unidade cai automaticamente quando o pedido chega a 5 e a 20 refeições.
           </p>
         </div>
 
@@ -253,15 +253,15 @@ export default async function RotinaPage() {
       <section className={styles.kits} id="kits" aria-labelledby="kits-title">
         <div className={styles.kitsHeading}>
           <div className={`${styles.sectionMarker} ${styles.sectionMarkerLight}`}>
-            <span>03</span> / Escolha seu kit
+            <span>03</span> / Monte seu pedido
           </div>
           <div>
-            <p className={styles.kicker}>Do primeiro prato à rotina completa</p>
+            <p className={styles.kicker}>Quanto mais refeições, menor o preço</p>
             <h2 id="kits-title">Quanto de tranquilidade cabe no seu freezer?</h2>
           </div>
           <p>
-            Três portas de entrada para a mesma experiência. O Kit 20 entrega o
-            melhor valor por refeição e resolve mais dias de uma só vez.
+            Escolha entre 1 e 30 refeições. A quantidade total, somando todos os
+            sabores, ativa automaticamente a faixa de preço correta.
           </p>
         </div>
 
@@ -269,13 +269,12 @@ export default async function RotinaPage() {
           flavors={routineProducts.map((product) => ({
             key: product.key,
             name: product.name,
-            price: product.price,
             stockQuantity: product.stockQuantity,
           }))}
         />
         <p className={styles.purchaseNote}>
-          <Check aria-hidden="true" /> Todos os kits desta página são compras
-          avulsas, sem renovação automática ou assinatura.
+          <Check aria-hidden="true" /> Todos os pedidos desta página são compras
+          avulsas, sem renovação automática ou assinatura. Os valores exibidos são no Pix.
         </p>
       </section>
 
@@ -335,8 +334,8 @@ export default async function RotinaPage() {
           <li>
             <span>01</span>
             <PackageCheck aria-hidden="true" />
-            <h3>Monte seu kit</h3>
-            <p>Escolha 1, 5 ou 20 refeições e distribua seus sabores.</p>
+            <h3>Monte seu pedido</h3>
+            <p>Escolha de 1 a 30 refeições e distribua seus sabores.</p>
           </li>
           <li>
             <span>02</span>
@@ -402,14 +401,14 @@ export default async function RotinaPage() {
         </div>
         <div className={styles.faqList}>
           <details>
-            <summary>Posso combinar sabores no mesmo kit?</summary>
+            <summary>Posso combinar sabores no mesmo pedido?</summary>
             <p>
-              Sim. Kits de 5 e 20 podem ser distribuídos livremente entre os três
-              sabores disponíveis.
+              Sim. Você pode distribuir livremente qualquer quantidade entre 1 e
+              30 refeições pelos sabores disponíveis.
             </p>
           </details>
           <details>
-            <summary>O Kit 20 é uma assinatura?</summary>
+            <summary>O pedido de 20 refeições é uma assinatura?</summary>
             <p>
               Não. Ele é uma compra avulsa, sem renovação automática. Assinaturas
               possuem contratação própria e serão apresentadas separadamente.
@@ -445,7 +444,7 @@ export default async function RotinaPage() {
           <p>Escolha seus sabores e deixe a próxima semana mais gostosa.</p>
         </div>
         <a href="#kits">
-          Montar meu kit <ChevronRight aria-hidden="true" />
+          Montar meu pedido <ChevronRight aria-hidden="true" />
         </a>
       </section>
 
@@ -463,7 +462,7 @@ export default async function RotinaPage() {
           </div>
           <nav aria-label="Navegação do rodapé">
             <span>Navegue</span>
-            <Link href="/">Cardápio Brasa</Link>
+            <Link href="/#cardapio">Cardápio Brasa</Link>
             <a href="#sabores">Linha Rotina</a>
             <Link href="/clube">Clube Corta Essa!</Link>
           </nav>

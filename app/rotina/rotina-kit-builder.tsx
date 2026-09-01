@@ -1,65 +1,73 @@
 "use client";
 
-import { Check, Minus, PackageCheck, Plus, RotateCcw } from "lucide-react";
+import {
+  Check,
+  MessageCircle,
+  Minus,
+  PackageCheck,
+  Plus,
+  RotateCcw,
+  WalletCards,
+} from "lucide-react";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { MetaTrackedLink } from "@/app/meta-tracked-link";
 import { formatPrice, whatsappNumber } from "@/lib/catalog";
 import styles from "./rotina.module.css";
 
-type PackageKey = "single" | "weekly" | "complete";
 type FlavorQuantities = Record<string, number>;
 
 export type RoutineFlavorOption = {
   key: string;
   name: string;
-  price: number;
   stockQuantity?: number | null;
 };
 
-type PackageOption = {
-  key: PackageKey;
+type PriceTier = {
+  id: string;
+  range: string;
+  min: number;
+  max: number;
+  unitPriceCents: number;
   eyebrow: string;
-  name: string;
-  description: string;
-  quantity: number;
-  price: number;
-  unitPrice: number;
-  saving?: number;
-  featured?: boolean;
+  example: string;
 };
 
-const STORAGE_KEY = "corta-essa-rotina-last-kit:v2";
-const STORAGE_CHANGE_EVENT = "corta-essa-rotina-last-kit-change:v2";
+const MIN_ORDER_QUANTITY = 1;
+const MAX_ORDER_QUANTITY = 30;
+const STORAGE_KEY = "corta-essa-rotina-last-order:v3";
+const STORAGE_CHANGE_EVENT = "corta-essa-rotina-last-order-change:v3";
+const PAYMENT_NOTE =
+  "Também aceitamos crédito e débito. O valor final, com as taxas da operadora, será informado antes da confirmação do pedido.";
 
-const packageDefinitions = [
+const priceTiers: PriceTier[] = [
   {
-    key: "single",
-    eyebrow: "Primeira experiência",
-    name: "1 refeição",
-    description: "Para conhecer a Linha Rotina no seu sabor preferido.",
-    quantity: 1,
+    id: "individual",
+    range: "1 a 4 refeições",
+    min: 1,
+    max: 4,
+    unitPriceCents: 2990,
+    eyebrow: "Para experimentar",
+    example: "1 refeição = R$ 29,90",
   },
   {
-    key: "weekly",
-    eyebrow: "Semana organizada",
-    name: "Kit 5",
-    description: "Cinco refeições e liberdade para combinar os sabores.",
-    quantity: 5,
-    price: 139,
+    id: "economico",
+    range: "5 a 19 refeições",
+    min: 5,
+    max: 19,
+    unitPriceCents: 2780,
+    eyebrow: "Preço reduzido",
+    example: "5 refeições = R$ 139,00",
   },
   {
-    key: "complete",
-    eyebrow: "Escolha completa",
-    name: "Kit 20",
-    description: "A solução mais completa para ter comida de verdade à mão.",
-    quantity: 20,
-    price: 529,
-    featured: true,
+    id: "melhor-preco",
+    range: "20 a 30 refeições",
+    min: 20,
+    max: 30,
+    unitPriceCents: 2645,
+    eyebrow: "Melhor preço",
+    example: "20 refeições = R$ 529,00",
   },
-] as const;
-
-const isPackageKey = (value: unknown): value is PackageKey =>
-  value === "single" || value === "weekly" || value === "complete";
+];
 
 const stockLimit = (flavor: RoutineFlavorOption) =>
   flavor.stockQuantity == null
@@ -68,44 +76,22 @@ const stockLimit = (flavor: RoutineFlavorOption) =>
 
 const hasStock = (flavor: RoutineFlavorOption) => stockLimit(flavor) > 0;
 
-const createDefaultQuantities = (
-  total: number,
-  flavors: RoutineFlavorOption[],
-): FlavorQuantities => {
-  const quantities = Object.fromEntries(
-    flavors.map((flavor) => [flavor.key, 0]),
-  ) as FlavorQuantities;
-  const available = flavors.filter(hasStock);
-  let remaining = total;
+const emptyQuantities = (flavors: RoutineFlavorOption[]) =>
+  Object.fromEntries(flavors.map((flavor) => [flavor.key, 0])) as FlavorQuantities;
 
-  while (remaining > 0 && available.length > 0) {
-    let changed = false;
-    for (const flavor of available) {
-      if (remaining === 0) break;
-      if (quantities[flavor.key] >= stockLimit(flavor)) continue;
-      quantities[flavor.key] += 1;
-      remaining -= 1;
-      changed = true;
-    }
-    if (!changed) break;
-  }
+const totalQuantity = (quantities: FlavorQuantities) =>
+  Object.values(quantities).reduce((total, quantity) => total + quantity, 0);
 
-  return quantities;
-};
+const priceTierForQuantity = (quantity: number) =>
+  priceTiers.find((tier) => quantity >= tier.min && quantity <= tier.max) ?? null;
 
-const canFillPackage = (quantity: number, flavors: RoutineFlavorOption[]) => {
-  if (flavors.some((flavor) => flavor.stockQuantity == null)) return true;
-  return (
-    flavors.reduce(
-      (total, flavor) => total + Math.max(0, flavor.stockQuantity ?? 0),
-      0,
-    ) >= quantity
-  );
+const totalPriceForQuantity = (quantity: number) => {
+  const tier = priceTierForQuantity(quantity);
+  return tier ? (tier.unitPriceCents * quantity) / 100 : 0;
 };
 
 const isFlavorQuantities = (
   value: unknown,
-  expectedTotal: number,
   flavors: RoutineFlavorOption[],
 ): value is FlavorQuantities => {
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
@@ -114,6 +100,7 @@ const isFlavorQuantities = (
   if (Object.keys(quantities).some((key) => !validKeys.has(key))) return false;
 
   const values = flavors.map((flavor) => Number(quantities[flavor.key] ?? 0));
+  const total = values.reduce((sum, quantity) => sum + quantity, 0);
   return (
     values.every(
       (quantity, index) =>
@@ -121,11 +108,12 @@ const isFlavorQuantities = (
         quantity >= 0 &&
         quantity <= stockLimit(flavors[index]),
     ) &&
-    values.reduce((total, quantity) => total + quantity, 0) === expectedTotal
+    total >= MIN_ORDER_QUANTITY &&
+    total <= MAX_ORDER_QUANTITY
   );
 };
 
-const subscribeToSavedKit = (onStoreChange: () => void) => {
+const subscribeToSavedOrder = (onStoreChange: () => void) => {
   window.addEventListener("storage", onStoreChange);
   window.addEventListener(STORAGE_CHANGE_EVENT, onStoreChange);
   return () => {
@@ -134,34 +122,42 @@ const subscribeToSavedKit = (onStoreChange: () => void) => {
   };
 };
 
-const getSavedKitSnapshot = () => window.localStorage.getItem(STORAGE_KEY);
+const getSavedOrderSnapshot = () => window.localStorage.getItem(STORAGE_KEY);
 
-const parseSavedKit = (
+const parseSavedOrder = (
   stored: string | null,
-  packages: PackageOption[],
   flavors: RoutineFlavorOption[],
 ) => {
   if (!stored) return null;
   try {
-    const parsed = JSON.parse(stored) as {
-      packageKey?: unknown;
-      quantities?: unknown;
-    };
-    if (!isPackageKey(parsed.packageKey)) return null;
-    const option = packages.find(({ key }) => key === parsed.packageKey);
-    if (
-      !option ||
-      !isFlavorQuantities(parsed.quantities, option.quantity, flavors)
-    ) {
-      return null;
-    }
-    return {
-      packageKey: parsed.packageKey,
-      quantities: parsed.quantities,
-    };
+    const parsed = JSON.parse(stored) as { quantities?: unknown };
+    return isFlavorQuantities(parsed.quantities, flavors)
+      ? parsed.quantities
+      : null;
   } catch {
     return null;
   }
+};
+
+const quantityMessage = (quantity: number) => {
+  if (quantity === 0) {
+    return "Escolha suas refeições. O preço por unidade cai automaticamente conforme a quantidade total.";
+  }
+  if (quantity < 5) {
+    const missing = 5 - quantity;
+    return `Adicione mais ${missing} ${missing === 1 ? "refeição" : "refeições"} e cada unidade passa a R$ 27,80 no Pix.`;
+  }
+  if (quantity === 19) {
+    return "Adicione mais 1 refeição e leve 20 por R$ 529,00 no Pix — apenas R$ 0,80 a mais que 19.";
+  }
+  if (quantity < 20) {
+    const missing = 20 - quantity;
+    return `Adicione mais ${missing} ${missing === 1 ? "refeição" : "refeições"} e cada unidade passa a R$ 26,45 no Pix.`;
+  }
+  if (quantity === MAX_ORDER_QUANTITY) {
+    return "Melhor preço ativado. Você atingiu o limite de 30 refeições para pedidos pelo site.";
+  }
+  return "Melhor preço ativado: R$ 26,45 por unidade no Pix.";
 };
 
 export function RotinaKitBuilder({
@@ -169,56 +165,23 @@ export function RotinaKitBuilder({
 }: {
   flavors: RoutineFlavorOption[];
 }) {
-  const availableFlavors = useMemo(() => flavors.filter(hasStock), [flavors]);
-  const baseSinglePrice =
-    availableFlavors[0]?.price ?? flavors[0]?.price ?? 29.9;
-  const packages = useMemo<PackageOption[]>(
-    () =>
-      packageDefinitions.map((option) => {
-        const price = "price" in option ? option.price : baseSinglePrice;
-        const saving = Math.max(0, baseSinglePrice * option.quantity - price);
-        return {
-          ...option,
-          price,
-          unitPrice: price / option.quantity,
-          saving: saving > 0.005 ? saving : undefined,
-        };
-      }),
-    [baseSinglePrice],
-  );
-  const [selectedKey, setSelectedKey] = useState<PackageKey>("complete");
   const [quantities, setQuantities] = useState<FlavorQuantities>(() =>
-    createDefaultQuantities(20, flavors),
+    emptyQuantities(flavors),
   );
-  const savedKitSnapshot = useSyncExternalStore(
-    subscribeToSavedKit,
-    getSavedKitSnapshot,
+  const savedOrderSnapshot = useSyncExternalStore(
+    subscribeToSavedOrder,
+    getSavedOrderSnapshot,
     () => null,
   );
-  const savedKit = useMemo(
-    () => parseSavedKit(savedKitSnapshot, packages, flavors),
-    [flavors, packages, savedKitSnapshot],
+  const savedQuantities = useMemo(
+    () => parseSavedOrder(savedOrderSnapshot, flavors),
+    [flavors, savedOrderSnapshot],
   );
 
-  const packageBase = packages.find((option) => option.key === selectedKey)!;
-  const selectedFlavor = flavors.find(
-    (flavor) => (quantities[flavor.key] ?? 0) > 0,
-  );
-  const selectedPrice =
-    selectedKey === "single"
-      ? selectedFlavor?.price ?? packageBase.price
-      : packageBase.price;
-  const selectedPackage = {
-    ...packageBase,
-    price: selectedPrice,
-    unitPrice: selectedPrice / packageBase.quantity,
-  };
-  const selectedTotal = Object.values(quantities).reduce(
-    (total, quantity) => total + quantity,
-    0,
-  );
-  const remaining = selectedPackage.quantity - selectedTotal;
-
+  const selectedTotal = totalQuantity(quantities);
+  const activeTier = priceTierForQuantity(selectedTotal);
+  const selectedPrice = totalPriceForQuantity(selectedTotal);
+  const maxReached = selectedTotal >= MAX_ORDER_QUANTITY;
   const composition = flavors
     .filter(({ key }) => (quantities[key] ?? 0) > 0)
     .map(({ key, name }) => `${quantities[key]}× ${name}`)
@@ -226,18 +189,23 @@ export function RotinaKitBuilder({
   const message = [
     "Olá! Quero reservar um pedido da Linha Rotina.",
     "",
-    `${selectedPackage.name} — ${formatPrice(selectedPackage.price)}`,
+    `${selectedTotal} ${selectedTotal === 1 ? "refeição" : "refeições"}`,
+    activeTier
+      ? `${formatPrice(activeTier.unitPriceCents / 100)} por unidade no Pix`
+      : "",
+    `Total no Pix: ${formatPrice(selectedPrice)}`,
     composition,
     "",
+    PAYMENT_NOTE,
+    "",
     "Podemos confirmar a disponibilidade e a entrega?",
-  ].join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
-
-  const selectPackage = (option: PackageOption) => {
-    if (!canFillPackage(option.quantity, flavors)) return;
-    setSelectedKey(option.key);
-    setQuantities(createDefaultQuantities(option.quantity, flavors));
-  };
+  const bulkQuoteUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    "Olá! Preciso de mais de 30 refeições da Linha Rotina e quero solicitar uma cotação.",
+  )}`;
 
   const changeFlavor = (key: string, delta: number) => {
     const flavor = flavors.find((item) => item.key === key);
@@ -247,24 +215,19 @@ export function RotinaKitBuilder({
       const currentValue = current[key] ?? 0;
       const nextValue = currentValue + delta;
       if (nextValue < 0 || nextValue > stockLimit(flavor)) return current;
-      const currentTotal = Object.values(current).reduce(
-        (total, quantity) => total + quantity,
-        0,
-      );
-      if (delta > 0 && currentTotal >= selectedPackage.quantity) return current;
+      if (delta > 0 && totalQuantity(current) >= MAX_ORDER_QUANTITY) {
+        return current;
+      }
       return { ...current, [key]: nextValue };
     });
   };
 
-  const restoreSavedKit = () => {
-    if (!savedKit) return;
-    setSelectedKey(savedKit.packageKey);
-    setQuantities({ ...savedKit.quantities });
+  const restoreSavedOrder = () => {
+    if (savedQuantities) setQuantities({ ...savedQuantities });
   };
 
   const persistSelection = () => {
-    const selection = { packageKey: selectedKey, quantities };
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(selection));
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ quantities }));
     window.dispatchEvent(new Event(STORAGE_CHANGE_EVENT));
   };
 
@@ -280,51 +243,28 @@ export function RotinaKitBuilder({
 
   return (
     <div className={styles.builder}>
-      <div className={styles.packageGrid} aria-label="Escolha o tamanho do pedido">
-        {packages.map((option) => {
-          const disabled = !canFillPackage(option.quantity, flavors);
-          const shownPrice =
-            option.key === "single" && selectedKey === "single"
-              ? selectedPrice
-              : option.price;
+      <div className={styles.priceTierGrid} aria-label="Preços por quantidade">
+        {priceTiers.map((tier) => {
+          const selected = activeTier?.id === tier.id;
           return (
-            <button
-              type="button"
-              key={option.key}
-              className={`${styles.packageCard}${
-                selectedKey === option.key
-                  ? ` ${styles.packageCardSelected}`
-                  : ""
-              }${option.featured ? ` ${styles.packageCardFeatured}` : ""}`}
-              aria-pressed={selectedKey === option.key}
-              onClick={() => selectPackage(option)}
-              disabled={disabled}
+            <article
+              className={`${styles.priceTierCard}${
+                selected ? ` ${styles.priceTierCardActive}` : ""
+              }${tier.id === "melhor-preco" ? ` ${styles.priceTierCardBest}` : ""}`}
+              key={tier.id}
+              aria-current={selected ? "true" : undefined}
             >
-              <span className={styles.packageEyebrow}>{option.eyebrow}</span>
-              {option.featured ? (
-                <span className={styles.packageBadge}>Melhor escolha</span>
+              <span>{tier.eyebrow}</span>
+              <strong>{tier.range}</strong>
+              <div>
+                <b>{formatPrice(tier.unitPriceCents / 100)}</b>
+                <small>por unidade no Pix</small>
+                <small>{tier.example} no Pix</small>
+              </div>
+              {selected ? (
+                <em><Check aria-hidden="true" /> Faixa atual</em>
               ) : null}
-              <strong className={styles.packageName}>{option.name}</strong>
-              <span className={styles.packageDescription}>{option.description}</span>
-              <span className={styles.packagePrice}>{formatPrice(shownPrice)}</span>
-              <span className={styles.packageUnitPrice}>
-                {formatPrice(shownPrice / option.quantity)} por refeição
-              </span>
-              {option.saving ? (
-                <span className={styles.packageSaving}>
-                  Economize {formatPrice(option.saving)}
-                </span>
-              ) : null}
-              <span className={styles.packageSelect}>
-                {disabled ? (
-                  "Estoque insuficiente"
-                ) : selectedKey === option.key ? (
-                  <><Check aria-hidden="true" /> Selecionado</>
-                ) : (
-                  "Escolher"
-                )}
-              </span>
-            </button>
+            </article>
           );
         })}
       </div>
@@ -333,24 +273,24 @@ export function RotinaKitBuilder({
         <div className={styles.composerHeading}>
           <div>
             <span>Monte do seu jeito</span>
-            <h3>
-              {selectedPackage.quantity === 1
-                ? "Escolha seu primeiro sabor."
-                : `Distribua suas ${selectedPackage.quantity} refeições.`}
-            </h3>
-            <p>Kits de 5 e 20 podem combinar livremente os sabores disponíveis.</p>
+            <h3>Escolha de 1 a 30 refeições.</h3>
+            <p>Combine livremente os sabores. O total define o preço de todas as unidades.</p>
           </div>
           <div className={styles.composerProgress} aria-live="polite">
             <strong>{selectedTotal}</strong>
-            <span>de {selectedPackage.quantity}</span>
+            <span>de {MAX_ORDER_QUANTITY}</span>
           </div>
         </div>
 
-        {savedKit ? (
+        <p className={styles.tierProgressMessage} aria-live="polite">
+          {quantityMessage(selectedTotal)}
+        </p>
+
+        {savedQuantities ? (
           <button
             type="button"
             className={styles.restoreButton}
-            onClick={restoreSavedKit}
+            onClick={restoreSavedOrder}
           >
             <RotateCcw aria-hidden="true" /> Repetir minha última composição
           </button>
@@ -380,7 +320,7 @@ export function RotinaKitBuilder({
                   <button
                     type="button"
                     onClick={() => changeFlavor(flavor.key, 1)}
-                    disabled={soldOut || remaining === 0 || reachedFlavorStock}
+                    disabled={soldOut || maxReached || reachedFlavorStock}
                     aria-label={`Aumentar ${flavor.name}`}
                   >
                     <Plus aria-hidden="true" />
@@ -393,11 +333,15 @@ export function RotinaKitBuilder({
 
         <div className={styles.composerFooter}>
           <div>
-            <span>Total do pedido</span>
-            <strong>{formatPrice(selectedPackage.price)}</strong>
-            <small>Taxa e disponibilidade confirmadas no atendimento.</small>
+            <span>Total no Pix</span>
+            <strong>{formatPrice(selectedPrice)}</strong>
+            <small>
+              {activeTier
+                ? `${formatPrice(activeTier.unitPriceCents / 100)} por unidade · ${selectedTotal} ${selectedTotal === 1 ? "refeição" : "refeições"}`
+                : "Escolha pelo menos 1 refeição para calcular o total."}
+            </small>
           </div>
-          {remaining === 0 ? (
+          {selectedTotal >= MIN_ORDER_QUANTITY ? (
             <MetaTrackedLink
               className={styles.builderCta}
               href={whatsappUrl}
@@ -405,17 +349,17 @@ export function RotinaKitBuilder({
               rel="noreferrer"
               metaEvent="InitiateCheckout"
               metaParameters={{
-                content_name: `Linha Rotina — ${selectedPackage.name}`,
+                content_name: `Linha Rotina — ${activeTier?.range}`,
                 content_category: "Linha Rotina",
-                content_ids: [`rotina-${selectedKey}`],
+                content_ids: [`rotina-${activeTier?.id}`],
                 content_type: "product_group",
                 currency: "BRL",
-                num_items: selectedPackage.quantity,
-                value: selectedPackage.price,
+                num_items: selectedTotal,
+                value: selectedPrice,
               }}
               secondaryMetaEvent="Contact"
               secondaryMetaParameters={{
-                content_name: `Linha Rotina — ${selectedPackage.name}`,
+                content_name: "Pedido progressivo Linha Rotina",
                 content_category: "WhatsApp",
               }}
               onClick={persistSelection}
@@ -426,11 +370,28 @@ export function RotinaKitBuilder({
             </MetaTrackedLink>
           ) : (
             <button className={styles.builderCta} type="button" disabled>
-              Escolha mais {remaining}{" "}
-              {remaining === 1 ? "refeição" : "refeições"}
+              Escolha pelo menos 1 refeição
             </button>
           )}
         </div>
+
+        <p className={styles.paymentMethodsNote}>
+          <WalletCards aria-hidden="true" />
+          <span>{PAYMENT_NOTE}</span>
+        </p>
+        <MetaTrackedLink
+          className={styles.bulkQuote}
+          href={bulkQuoteUrl}
+          target="_blank"
+          rel="noreferrer"
+          metaEvent="Contact"
+          metaParameters={{
+            content_name: "Cotação acima de 30 refeições",
+            content_category: "Linha Rotina",
+          }}
+        >
+          <MessageCircle aria-hidden="true" /> Precisa de mais de 30? Solicite uma cotação pelo WhatsApp.
+        </MetaTrackedLink>
       </div>
     </div>
   );
