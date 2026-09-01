@@ -49,7 +49,7 @@ const plans: Plan[] = [
     price: 179,
     summary: "4 kits Brasa + Divine Flour",
     saving: 7,
-    comparison: "Valor avulso de referência: R$ 186",
+    comparison: "Valor avulso no Pix de referência: R$ 186",
     benefits: [
       "4 kits Brasa à escolha por mês",
       "1 Divine Flour de 150 g",
@@ -65,8 +65,8 @@ const plans: Plan[] = [
     profile: "Comida de verdade pronta para acompanhar os dias corridos.",
     price: 519,
     summary: "20 marmitas por ciclo",
-    saving: 79,
-    comparison: "20 refeições avulsas: R$ 598",
+    saving: 10,
+    comparison: "20 refeições avulsas no Pix: R$ 529",
     benefits: [
       "20 marmitas gourmet congeladas",
       "Combinação livre entre os três sabores",
@@ -82,8 +82,8 @@ const plans: Plan[] = [
     profile: "Brasa e Rotina juntas para viver o Corta Essa por inteiro.",
     price: 669,
     summary: "Brasa + 20 marmitas por ciclo",
-    saving: 115,
-    comparison: "Compra avulsa equivalente: R$ 784",
+    saving: 46,
+    comparison: "Compra avulsa equivalente no Pix: R$ 715",
     extraSaving: "Também R$ 29 abaixo das duas assinaturas separadas",
     featured: true,
     benefits: [
@@ -220,7 +220,7 @@ export default function ClubPage() {
             <div className={styles.priceSeal}>
               <span>A partir de</span>
               <strong>R$ 179</strong>
-              <span>por mês</span>
+              <span>no Pix · por mês</span>
             </div>
             <span className={styles.visualCaption}>Brasa + Rotina</span>
           </div>
@@ -303,7 +303,7 @@ export default function ClubPage() {
                 <span>{plan.summary}</span>
                 <div>
                   <strong>{money(plan.price)}</strong>
-                  <span>/ mês</span>
+                  <span>/ mês · no Pix</span>
                 </div>
                 <div className={styles.planSaving}>
                   <b>Economize {money(plan.saving)}</b>
@@ -350,8 +350,9 @@ export default function ClubPage() {
 
         <p className={styles.planFootnote}>
           Adesão formalizada por contrato e sujeita à disponibilidade de vagas.
-          Datas, taxa de entrega e forma de pagamento são confirmadas
-          individualmente pelo WhatsApp.
+          Datas e taxa de entrega são confirmadas individualmente pelo WhatsApp.
+          Também aceitamos crédito e débito. O valor final, com as taxas da
+          operadora, será informado antes da confirmação do pedido.
         </p>
       </section>
 

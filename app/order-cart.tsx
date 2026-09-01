@@ -180,7 +180,7 @@ export function OrderCart({
         "",
         itemSummary,
         "",
-        `Total: ${formatPrice(result.total_cents / 100)}`,
+        `Total no Pix: ${formatPrice(result.total_cents / 100)}`,
         `Entrega desejada: ${deliveryLabel}`,
         `Entrega: ${address}`,
         customer.reference ? `Referência: ${customer.reference}` : "",
@@ -263,6 +263,11 @@ export function OrderCart({
                 <CalendarDays aria-hidden="true" /> Entrega desejada: {confirmation.deliveryLabel}
               </p>
               <strong>{formatPrice(confirmation.total_cents / 100)}</strong>
+              <small className="checkout-success__price-note">no Pix</small>
+              <p className="checkout-payment-note">
+                Também aceitamos crédito e débito. O valor final, com as taxas da
+                operadora, será informado antes da confirmação do pedido.
+              </p>
               <a
                 href={confirmation.whatsappUrl}
                 target="_blank"
@@ -325,6 +330,7 @@ export function OrderCart({
                             </span>
                           )}
                           <strong>{formatPrice(item.product.price * item.quantity)}</strong>
+                          <small className="checkout-line__price-note">no Pix</small>
                         </div>
                         <div className="checkout-line__actions" aria-label={`Quantidade de ${item.product.name}`}>
                           <button type="button" onClick={() => onDecrease(item)} aria-label={`Diminuir ${item.product.name}`}>
@@ -355,10 +361,17 @@ export function OrderCart({
 
                 <div className="checkout-total">
                   <span>Total dos produtos</span>
-                  <strong>{formatPrice(subtotal)}</strong>
+                  <div>
+                    <strong>{formatPrice(subtotal)}</strong>
+                    <small>no Pix</small>
+                  </div>
                 </div>
                 <p className="checkout-summary__note">
                   Taxa e prazo de entrega são confirmados no WhatsApp.
+                </p>
+                <p className="checkout-payment-note">
+                  Também aceitamos crédito e débito. O valor final, com as taxas da
+                  operadora, será informado antes da confirmação do pedido.
                 </p>
               </section>
 

@@ -821,6 +821,104 @@
   gap: 28px;
 }
 
+.priceTierGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.priceTierCard {
+  position: relative;
+  display: grid;
+  min-height: 220px;
+  align-content: start;
+  padding: 28px;
+  border: 1.5px solid rgba(246, 241, 230, 0.25);
+  background: rgba(246, 241, 230, 0.035);
+  color: var(--paper);
+}
+
+.priceTierCard > span {
+  color: var(--green);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.priceTierCard > strong {
+  margin-top: 14px;
+  font-family: var(--display-accent);
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-weight: 400;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.priceTierCard > div {
+  display: grid;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 24px;
+}
+
+.priceTierCard b {
+  font-family: var(--display);
+  font-size: clamp(2.4rem, 4vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.priceTierCard small {
+  color: rgba(246, 241, 230, 0.62);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.priceTierCard em {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--orange);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.priceTierCard em svg {
+  width: 15px;
+  height: 15px;
+}
+
+.priceTierCardActive {
+  border-color: var(--green);
+  background: rgba(127, 196, 41, 0.12);
+  box-shadow: inset 0 0 0 1px var(--green);
+}
+
+.priceTierCardBest {
+  border-color: var(--orange);
+}
+
+.priceTierCardBest.priceTierCardActive {
+  background: var(--paper);
+  color: var(--deep);
+  box-shadow: 10px 10px 0 var(--orange);
+}
+
+.priceTierCardBest.priceTierCardActive > span,
+.priceTierCardBest.priceTierCardActive em {
+  color: var(--orange);
+}
+
+.priceTierCardBest.priceTierCardActive small {
+  color: var(--muted);
+}
+
 .packageGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1044,6 +1142,17 @@
   text-transform: uppercase;
 }
 
+.tierProgressMessage {
+  margin: 24px 0 0;
+  padding: 14px 16px 12px;
+  border-left: 4px solid var(--orange);
+  background: rgba(239, 73, 31, 0.08);
+  color: var(--green-deep);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
 .restoreButton {
   display: inline-flex;
   align-items: center;
@@ -1197,6 +1306,39 @@
   background: #8b9692;
   cursor: not-allowed;
   opacity: 0.72;
+}
+
+.paymentMethodsNote {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  margin: 26px 0 0;
+  padding: 16px;
+  border: 1px solid rgba(23, 48, 40, 0.18);
+  background: rgba(127, 196, 41, 0.1);
+  color: var(--green-deep);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.paymentMethodsNote svg,
+.bulkQuote svg {
+  width: 18px;
+  height: 18px;
+  color: var(--orange);
+}
+
+.bulkQuote {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  border-bottom: 1px solid var(--green-dark);
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .purchaseNote {
@@ -1743,6 +1885,7 @@
     padding: 44px;
   }
 
+  .priceTierGrid,
   .packageGrid,
   .valueGrid,
   .howItWorks ol {
